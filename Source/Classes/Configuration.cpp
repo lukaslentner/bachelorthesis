@@ -18,6 +18,7 @@ class Configuration {
     int N;
     bool *spins;
     int Nr;
+    int LMax;
     int L;
     int *s;
     int *X;
@@ -35,10 +36,11 @@ class Configuration {
       spins = new bool[N];
       for(int i = 0; i < N; i++) spins[i] = gsl_rng_uniform_int(generator, 2);
       Nr = 0;
-      L = 200;
-      s = new int[L];
-      for(int p = 0; p < L; p++) s[p] = 0;
-      X = new int[4 * L];
+      LMax = 10000;
+      L = 10;
+      s = new int[LMax];
+      for(int p = 0; p < LMax; p++) s[p] = 0;
+      X = new int[4 * LMax];
         
     };
 
@@ -57,10 +59,12 @@ class Configuration {
     virtual int getI2(int b) = 0;
     
     void doSweep() {
-    
+      
       doDiagonalUpdate();
       
       doOperatorLoopUpdate();
+      
+      if(L < 4 * Nr / 3) L = 4 * Nr / 3;
     
     };
     
@@ -73,15 +77,15 @@ class Configuration {
           int b = gsl_rng_uniform_int(generator, Nb) + 1;
 
           if(spins[getI1(b)] == spins[getI2(b)]) continue; // if bond-neighbour spins are parallel -> go to next p
-
-          if(gsl_rng_uniform(generator) < ((long double) Nb) / 2 / (L - Nr) / T) {
+          
+          if(gsl_rng_uniform(generator) < ((long double) Nb) / ((long double) 2 * (L - Nr) * T)) {
             s[p] = 2 * b;
             Nr++;
           }
 
         } else if(s[p] % 2 == 0) { // Diagonal operator -> try to remove
         
-          if(gsl_rng_uniform(generator) < ((long double) 2) * (L - Nr + 1) * T / Nb) {
+          if(gsl_rng_uniform(generator) < (((long double) 2) * (L - Nr + 1) * T) / Nb) {
             s[p] = 0;
             Nr--;
           }
@@ -96,8 +100,6 @@ class Configuration {
         }
       
       }
-      
-      cerr << "Diagonal Update" << getSpinStatesAsString() << '%' << getSAsString() << endl;
     
     };
     
@@ -143,7 +145,7 @@ class Configuration {
       }
       
       // Link vertexes periodicly if they interacted with operators
-      for(int i; i < N; i++) {
+      for(int i = 0; i < N; i++) {
       
         if(vFirst[i] != -1) {
           X[vFirst[i]] = vLast[i];
@@ -154,6 +156,8 @@ class Configuration {
     
       // Do the actual update
       for(int v = 0; v < 4 * L; v += 2) {
+      
+        if(X[v] < 0) continue;
         
         int vT = v;
         bool flipping = gsl_rng_uniform(generator) < 0.5;
@@ -166,14 +170,11 @@ class Configuration {
             s[p] = s[p] ^ 1;
           }
           
-          // Remember old
-          int vTOld = vT;
-          
           // Walk to other operator
           vT = X[vT];
           
           // Delete the way I went and the way back
-          X[v] = X[vTOld] = flipping ? -2 : -1;
+          X[vT] = X[X[vT]] = flipping ? -2 : -1;
           
           // Walk to neighbour on operator
           vT = vT ^ 1;
@@ -192,8 +193,6 @@ class Configuration {
         }
       
       }
-      
-      cerr << "Loop Update" << getSpinStatesAsString() << '%' << getSAsString() << endl;
     
     };
     
@@ -215,17 +214,17 @@ class Configuration {
       
     };
     
-    string getSAsString() {
-      
+    string intArrayToString(int *a, int c) {
+    
       stringstream out;
     
-      for(int i = 0; i < N; i++) {
-        if(i != 0) out << ',';
-        out << s[i];
+      for(int i = 0; i < c; i++) {
+        if(i != 0) out << ",";
+        out << a[i];
       }
       
       return out.str();
-      
+    
     };
 
 };
