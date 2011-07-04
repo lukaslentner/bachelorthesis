@@ -54,7 +54,6 @@ class Configuration {
 
     };
     
-    virtual int getNb(int n) = 0;
     virtual int getI1(int b) = 0;
     virtual int getI2(int b) = 0;
     
@@ -199,6 +198,18 @@ class Configuration {
     void setTemperature(long double T_Parameter) {
     
       T = T_Parameter;
+    
+    };
+    
+    int getCountOfRealOperators() {
+    
+      return Nr;
+    
+    };
+    
+    int getCountOfBonds() {
+    
+      return Nb;
     
     };
     

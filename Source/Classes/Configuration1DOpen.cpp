@@ -1,8 +1,3 @@
-#include <iostream>
-#include <string>
-#include <cmath>
-#include <gsl/gsl_rng.h>
-
 using namespace std;
 
 class Configuration1DOpen : public Configuration {

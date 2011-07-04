@@ -1,5 +1,12 @@
+//TODO: Pseudo thermalization should become self tested
+//TODO: Errorbars
+//TODO: Other models
+
 #include "Classes/Configuration.cpp"
+#include "Classes/Configuration1DOpen.cpp"
 #include "Classes/Configuration1DPeriodic.cpp"
+#include "Classes/Configuration2DOpen.cpp"
+#include "Classes/Configuration2DPeriodic.cpp"
 
 #include <fstream>
 #include <cstdlib>
@@ -13,77 +20,115 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
   if(argc != 5) {
-    cerr << "ERROR: Please specify 4 parameters (model[=0:1DO,1:1DP,2:2DO,3:2DP], N, temperatureStart, temperatureEnd)" << endl;
+    cerr << "[SSE] Error: Please specify 4 parameters (Model, Size, Temperature at the start, Temperature at the end)" << endl;
     return EXIT_FAILURE;
   }
 
   int model                    = atoi(argv[1]);
-  int N                        = atoi(argv[2]);
+  int size                     = atoi(argv[2]);
   long double temperatureStart = atof(argv[3]);
   long double temperatureEnd   = atof(argv[4]);
 
   if(temperatureStart > temperatureEnd) swap(temperatureStart, temperatureEnd);
-
-  printf("# SSE - Data\n");
-  printf("# ----------------------------------------\n");
-  printf("# Model [=0:1DO,1:1DP,2:2DO,3:2DP] = %.10i\n" , model);
-  printf("# N                                = %.10i\n" , N);
-  printf("# TemperatureStart                 = %.10Le\n", temperatureStart);
-  printf("# TemperatureEnd                   = %.10Le\n", temperatureEnd);
   
   const long double temperatureStep = 0.01;
   const int countMeasurements = 100;
   const int binSize = 1000;
   
-  Configuration *config = new Configuration1DPeriodic(N, temperatureEnd);
+  Configuration *config;
+  string modelLabel = "";
   
-  printf("#\n");
-  printf("# %-17s | %-18s | %-18s | %-18s | %-100s\n",
+  switch(model) {
+  
+    case 0:
+      config = new Configuration1DOpen(size, temperatureEnd);
+      modelLabel = "1D-Open";
+      break;
+  
+    case 1:
+      config = new Configuration1DPeriodic(size, temperatureEnd);
+      modelLabel = "1D-Periodic";
+      break;
+  
+    case 2:
+      config = new Configuration2DOpen(size, temperatureEnd);
+      modelLabel = "2D-Open";
+      break;
+  
+    case 3:
+      config = new Configuration2DPeriodic(size, temperatureEnd);
+      modelLabel = "2D-Periodic";
+      break;
+  
+    default:
+      cerr << "[SSE] Error: The parameter model has to be within [0;3]" << endl;
+      return EXIT_FAILURE;
+  
+  }
+
+  cout << "#\n";
+  cout << "# SSE - DATA\n";
+  cout << "#\n";
+  cout << "# ----------------------------------------\n";
+  cout << "#\n";
+  cout << "# Model            = " << modelLabel << "\n";
+  
+  printf("# Size             = %.10i\n" , size);
+  printf("# TemperatureStart = %.10Le\n", temperatureStart);
+  printf("# TemperatureEnd   = %.10Le\n", temperatureEnd);
+  
+  printf("#\n#\n");
+  printf("# %-17s | %-18s | %-18s | %-18s | %-18s\n",
          "Model",
-         "N",
+         "Size",
          "Temperature",
          "Energy",
-         "Configuration at last measurement");
+         "Specific Heat");
+  printf("# ------------------------------------------------------------------------------------------------------\n");
    
-  long double sumOfNr = 0;
-  long double tempSumOfNr = 0;
+  long double sumOfCountOfRealOperators = 0; 
+  long double sumOfCountOfRealOperatorsSquared = 0;
+  long double tempSumOfCountOfRealOperators = 0;
+  long double tempSumOfCountOfRealOperatorsSquared = 0;
 
   for(long double temperature = temperatureEnd; temperature > temperatureStart + (temperatureStep / 2); temperature -= temperatureStep) {
     
     for(int j = 0; j < 10000; j++) {
-    
       config->doSweep();
-
     }
 
     config->setTemperature(temperature);
    
-    sumOfNr = 0;
+    sumOfCountOfRealOperators        = 0;
+    sumOfCountOfRealOperatorsSquared = 0;
   
     for(int i = 0; i < binSize * countMeasurements; i += binSize) {
     
-      tempSumOfNr = 0;
+      tempSumOfCountOfRealOperators        = 0;
+      tempSumOfCountOfRealOperatorsSquared = 0;
     
       for(int j = 0; j < binSize; j++) {
       
         config->doSweep();
           
-        tempSumOfNr += config->Nr;
+        tempSumOfCountOfRealOperators        +=     config->getCountOfRealOperators();
+        tempSumOfCountOfRealOperatorsSquared += pow(config->getCountOfRealOperators(), 2);
 
       }
       
-      sumOfNr += tempSumOfNr / binSize;
+      sumOfCountOfRealOperators        += tempSumOfCountOfRealOperators        / binSize;
+      sumOfCountOfRealOperatorsSquared += tempSumOfCountOfRealOperatorsSquared / binSize;
       
     }
     
-    cerr << "# SSE: " << model << "%" << N << "%" << temperature << endl;
+    cerr << "[SSE] Info: Model=" << modelLabel << ", Size=" << size << ", Temperature=" << temperature << endl;
 
-    printf("%20.20i|%20.20i|%+20.13Le|%+20.13Le|",
+    printf("%20.20i|%20.20i|%+20.13Le|%+20.13Le|%+20.13Le\n",
            model,
-           N,
+           size,
            temperature,
-           -sumOfNr * temperature / countMeasurements);
-    cout << config->getSpinStatesAsString() << endl;
+           (-sumOfCountOfRealOperators * temperature / countMeasurements) + ((long double) config->getCountOfBonds() / 4),
+           (sumOfCountOfRealOperatorsSquared / countMeasurements) - pow(sumOfCountOfRealOperators / countMeasurements, 2) - (sumOfCountOfRealOperators / countMeasurements));
 
   }
   
