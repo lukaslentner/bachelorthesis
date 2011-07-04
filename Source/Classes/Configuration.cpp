@@ -77,14 +77,14 @@ class Configuration {
 
           if(spins[getI1(b)] == spins[getI2(b)]) continue; // if bond-neighbour spins are parallel -> go to next p
           
-          if(gsl_rng_uniform(generator) < ((long double) Nb) / ((long double) 2 * (L - Nr) * T)) {
+          if(gsl_rng_uniform(generator) < ((long double) Nb) / (long double) 2 / (L - Nr) / T) {
             s[p] = 2 * b;
             Nr++;
           }
 
         } else if(s[p] % 2 == 0) { // Diagonal operator -> try to remove
         
-          if(gsl_rng_uniform(generator) < (((long double) 2) * (L - Nr + 1) * T) / Nb) {
+          if(gsl_rng_uniform(generator) < (long double) 2 * (L - Nr + 1) * T / Nb) {
             s[p] = 0;
             Nr--;
           }
