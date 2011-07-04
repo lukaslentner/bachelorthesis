@@ -1,0 +1,9 @@
+# SSE - Data
+# ----------------------------------------
+# Model [=0:1DO,1:1DP,2:2DO,3:2DP] = 0000000001
+# Size                             = 0000000010
+# TemperatureStart                 = 4.0000000000e+00
+# TemperatureEnd                   = 4.0100000000e+00
+#
+# Model             | Size               | Temperature        | RelaxationTime     | Energy             | Configuration at last measurement                                                                   
+# ----------------------
