@@ -1,3 +1,6 @@
+//TODO: Error binning (relaxationTime)
+//TODO: Regognize Thermalization
+
 #ifndef CLASS_SSEALGORITHM
 #define CLASS_SSEALGORITHM
 
@@ -21,75 +24,6 @@ class SSEAlgorithm : public AbstractAlgorithm {
     int l;
     int *s;
     int *x;
-    
-  public:
-    
-    SSEAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
-    
-      gsl_rng_env_setup();
-      generatorType = gsl_rng_default;
-      generator = gsl_rng_alloc(generatorType);
-      gsl_rng_set(generator, time(NULL));
-
-      spins = new bool[model->getN()];
-      for(int i = 0; i < model->getN(); i++) spins[i] = gsl_rng_uniform_int(generator, 2);
-      nr = 0;
-      countMeasurements = 100;
-      binSize = 1000;
-      lMax = 10000;
-      l = 10;
-      s = new int[lMax];
-      for(int p = 0; p < lMax; p++) s[p] = 0;
-      x = new int[4 * lMax];
-    
-    };
-    
-    ~SSEAlgorithm() {
-
-      delete x;
-      delete s;
-      delete spins;
-
-      gsl_rng_free(generator);
-
-    };
-    
-    void runTemperatureRound() {
-      
-      long double sumOfNr = 0; 
-      long double sumOfNrSquared = 0;
-      long double tempSumOfNr = 0; 
-      long double tempSumOfNrSquared = 0;
-      
-      for(int j = 0; j < 10000; j++) {
-        doSweep();
-      }
-      
-      for(int i = 0; i < binSize * countMeasurements; i += binSize) {
-      
-        tempSumOfNr = 0; 
-        tempSumOfNrSquared = 0;
-      
-        for(int j = 0; j < binSize; j++) {
-        
-          doSweep();
-            
-          tempSumOfNr        += nr;
-          tempSumOfNrSquared += pow(nr, 2);
-
-        }
-        
-        sumOfNr        += tempSumOfNr        / binSize;
-        sumOfNrSquared += tempSumOfNrSquared / binSize;
-        
-      }
-      
-      avE = (-sumOfNr * t / countMeasurements) + ((long double) model->getNb() / 4);
-      erE = 0;
-      avC = (sumOfNrSquared / countMeasurements) - pow(sumOfNr / countMeasurements, 2) - (sumOfNr / countMeasurements);
-      erC = 0;
-    
-    };
     
     void doSweep() {
       
@@ -145,12 +79,10 @@ class SSEAlgorithm : public AbstractAlgorithm {
       int b;
       int i1;
       int i2;
-//std::cerr << "§";
+
       int *vFirst = new int[model->getN()];
-//std::cerr << "$";
       for(int i = 0; i < model->getN(); i++) vFirst[i] = -1;
       int *vLast = new int[model->getN()];
-//std::cerr << "%";
       for(int i = 0; i < model->getN(); i++) vLast[i]  = -1;
       
       for(int v = 0; v < 4 * l; v++) x[v] = -1;
@@ -239,6 +171,75 @@ class SSEAlgorithm : public AbstractAlgorithm {
         }
       
       }
+    
+    };
+    
+  public:
+    
+    SSEAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
+    
+      gsl_rng_env_setup();
+      generatorType = gsl_rng_default;
+      generator = gsl_rng_alloc(generatorType);
+      gsl_rng_set(generator, time(NULL));
+
+      spins = new bool[model->getN()];
+      for(int i = 0; i < model->getN(); i++) spins[i] = gsl_rng_uniform_int(generator, 2);
+      nr = 0;
+      countMeasurements = 100;
+      binSize = 1000;
+      lMax = 10000;
+      l = 10;
+      s = new int[lMax];
+      for(int p = 0; p < lMax; p++) s[p] = 0;
+      x = new int[4 * lMax];
+    
+    };
+    
+    ~SSEAlgorithm() {
+
+      delete x;
+      delete s;
+      delete spins;
+
+      gsl_rng_free(generator);
+
+    };
+    
+    void runTemperatureRound() {
+      
+      long double sumOfNr = 0; 
+      long double sumOfNrSquared = 0;
+      long double tempSumOfNr = 0; 
+      long double tempSumOfNrSquared = 0;
+      
+      for(int j = 0; j < 10000; j++) {
+        doSweep();
+      }
+      
+      for(int i = 0; i < binSize * countMeasurements; i += binSize) {
+      
+        tempSumOfNr = 0; 
+        tempSumOfNrSquared = 0;
+      
+        for(int j = 0; j < binSize; j++) {
+        
+          doSweep();
+            
+          tempSumOfNr        += nr;
+          tempSumOfNrSquared += pow(nr, 2);
+
+        }
+        
+        sumOfNr        += tempSumOfNr        / binSize;
+        sumOfNrSquared += tempSumOfNrSquared / binSize;
+        
+      }
+      
+      avE = (-sumOfNr * t / countMeasurements) + ((long double) model->getNb() / 4);
+      erE = 0;
+      avC = (sumOfNrSquared / countMeasurements) - pow(sumOfNr / countMeasurements, 2) - (sumOfNr / countMeasurements);
+      erC = 0;
     
     };
 

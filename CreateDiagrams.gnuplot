@@ -8,9 +8,9 @@ set xlabel "Temperature"
 set output "Energy-Temperature.eps"
 set title "Energy - Temperature"
 set ylabel "Energy"
-plot "Data" using 3:4
+plot "Data" using 4:5
 
 set output "SpecHeat-Temperature.eps"
 set title "Specific Heat - Temperature"
 set ylabel "Specific Heat"
-plot "Data" using 3:5
+plot "Data" using 4:7
