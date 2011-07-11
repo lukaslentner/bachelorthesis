@@ -14,11 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#include <atlas_enum.h>
-//#include "clapack.h"
-
 #include <tnt/tnt_array2d.h>
-#include <jama_eig.h>
+#include <jama/jama_eig.h>
 
 using namespace std;
 
@@ -112,47 +109,82 @@ class ED {
 
 int main(int argc, char *argv[]) {
 
-  int N = 3;
-  int TwoPowN = pow(2, N);
-  /*double **H;
-  
-  H = (double**) malloc(TwoPowN * sizeof(*H));
-  if(H == NULL) throw "Problems allocating memory";
-  for(int bs1 = 0; bs1 < TwoPowN; bs1++) {
-    H[bs1] = (double*) malloc(TwoPowN * sizeof(**H));
-    if(H[bs1] == NULL) throw "Problems allocating memory";
-    for(int bs2 = 0; bs2 < TwoPowN; bs2++) {
-      H[bs1][bs2] = 0;
-    }
-  }*/
-  
-  TNT::Array2D<double> H(TwoPowN, TwoPowN, 0.0);
-  TNT::Array2D<double> D(TwoPowN, TwoPowN, 0.0);
-  
-  ED ed;
+  try {
 
-  for(int bs = 0; bs < TwoPowN; bs++) {
-    ed.H2bs(H, bs, N, TwoPowN);
-  }
+    if(argc != 5) throw "[SSE] Error: Please specify 4 parameters (Model, Size, Temperature at the start, Temperature at the end)";
+
+    int model                    = atoi(argv[1]);
+    int size                     = atoi(argv[2]);
+    long double temperatureStart = atof(argv[3]);
+    long double temperatureEnd   = atof(argv[4]);
+
+    if(temperatureStart > temperatureEnd) swap(temperatureStart, temperatureEnd);
+    
+    int N = 3;
+    int TwoPowN = pow(2, size);
+    double temperatureStep = 0.01;
   
-  for(int bs1 = 0; bs1 < TwoPowN; bs1++) {
-    cout << "[";
-    for(int bs2 = 0; bs2 < TwoPowN; bs2++) {
-      printf("% .3f ", H[bs1][bs2]);
+ 
+    ED ed;
+    
+    cout << "#\n";
+    cout << "# ED - DATA\n";
+    cout << "#\n";
+    cout << "# ----------------------------------------\n";
+    cout << "#\n";
+    
+    printf("# Size             = %.10i\n" , size);
+    printf("# TemperatureStart = %.10Le\n", temperatureStart);
+    printf("# TemperatureEnd   = %.10Le\n", temperatureEnd);
+    
+    printf("#\n#\n");
+    printf("# %-17s | %-18s | %-18s | %-18s | %-18s\n",
+           "Model",
+           "Size",
+           "Temperature",
+           "Energy",
+           "Specific Heat");
+    printf("# ------------------------------------------------------------------------------------------------------\n");
+     
+    for(long double temperature = temperatureEnd; temperature > temperatureStart + (temperatureStep / 2); temperature -= temperatureStep) {
+
+      TNT::Array2D<double> H(TwoPowN, TwoPowN, 0.0);
+      TNT::Array2D<double> D(TwoPowN, TwoPowN, 0.0);
+
+      for(int bs = 0; bs < TwoPowN; bs++) {
+        ed.H2bs(H, bs, size, TwoPowN);
+      }
+
+      JAMA::Eigenvalue<double> Ev(H);
+  
+      Ev.getD(D);
+
+      double avH = 0;
+      double Z = 0;
+
+      for(int bs = 0; bs < TwoPowN; bs++) {
+        avH += exp(-H[bs][bs]/temperature)*H[bs][bs];
+        Z   += exp(-H[bs][bs]/temperature);
+      }
+      
+      cerr << "[ED] Info: Size=" << size << ", Temperature=" << temperature << endl;
+
+      printf("%20.20i|%20.20i|%+20.13Le|%+20.13e|%+20.13e\n",
+             model,
+             size,
+             temperature,
+             avH/Z,
+             0.0);
+
     }
-    cout << "]" << endl;
-  }
+
+    return EXIT_SUCCESS;
   
-  JAMA::Eigenvalue<double> Ev(H);
+  } catch(const char *message) {
   
-  Ev.getD(D);
+    cerr << message << endl;
+    return EXIT_FAILURE;
   
-  for(int bs1 = 0; bs1 < TwoPowN; bs1++) {
-    cout << "[";
-    for(int bs2 = 0; bs2 < TwoPowN; bs2++) {
-      printf("% .3f ", D[bs1][bs2]);
-    }
-    cout << "]" << endl;
   }
 
 };
