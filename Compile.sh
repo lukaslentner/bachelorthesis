@@ -1,3 +1,3 @@
 #!/bin/bash
 
-c++ Source/SSE.cpp -lgsl -lgslcblas -lm -o SSE
+c++ Source/QHS.cpp -lgsl -lgslcblas -lm -o QHS
