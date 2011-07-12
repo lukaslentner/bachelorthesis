@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     
     }
     
-    if(startTemperature <= 0) throw "[QHS] Error: The Start-Temperature has to be positive";
+    if(startTemperature < 0) throw "[QHS] Error: The Start-Temperature has to be positive or zero";
     if(endTemperature   <= 0) throw "[QHS] Error: The End-Temperature has to be positive";
     if(temperatureStep  <= 0) throw "[QHS] Error: The Temperature-Step has to be positive";
     if(startTemperature > endTemperature) std::swap(startTemperature, endTemperature);

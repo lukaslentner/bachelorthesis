@@ -20,19 +20,19 @@ class EDAlgorithm : public AbstractAlgorithm {
       for(int b = 1; b <= model->getNb(); b++) {
       
         tempBs = bs;
-        value = 2;
+        value = 1;
         szAction(model->getI2(b), &tempBs, &value);
         szAction(model->getI1(b), &tempBs, &value);
         if(tempBs >= 0) h[bs][tempBs] += value;
         
         tempBs = bs;
-        value = 1;
+        value = 0.5;
         smAction(model->getI2(b), &tempBs, &value);
         spAction(model->getI1(b), &tempBs, &value);
         if(tempBs >= 0) h[bs][tempBs] += value;
         
         tempBs = bs;
-        value = 1;
+        value = 0.5;
         spAction(model->getI2(b), &tempBs, &value);
         smAction(model->getI1(b), &tempBs, &value);
         if(tempBs >= 0) h[bs][tempBs] += value;
