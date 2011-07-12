@@ -1,10 +1,12 @@
 #include "Classes/Model/Open1DModel.cpp"
 #include "Classes/Model/Periodic1DModel.cpp"
+#include "Classes/Model/Open2DModel.cpp"
 #include "Classes/Model/Periodic2DModel.cpp"
 
 #include "Classes/Algorithm/SSEAlgorithm.cpp"
 #include "Classes/Algorithm/EDAlgorithm.cpp"
 
+#include <cstdlib>
 #include <iostream>
 
 int main(int argc, char *argv[]) {
@@ -38,12 +40,17 @@ int main(int argc, char *argv[]) {
         break;
     
       case 2:
+        model = new Open2DModel(size);
+        modelLabel = "Open-2D";
+        break;
+    
+      case 3:
         model = new Periodic2DModel(size);
         modelLabel = "Periodic-2D";
         break;
     
       default:
-        throw "[QHS] Error: The Model-Index has to be within [0;2]";
+        throw "[QHS] Error: The Model-Index has to be within [0;3]";
     
     }
 
