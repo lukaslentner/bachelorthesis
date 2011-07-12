@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    if(argc != 7) throw "[QHS] Error: Please specify 6 parameters (Size, Model-Index, Algorithm-Index, Start-Temperature, End-Temperature, Temperature-Step)";
+    if(argc != 7) throw "[QHS] Error: Please specify 6 parameters (Size, Model-Index, Algorithm-Index, Start-Temperature, End-Temperature, Temperature-Step)\n              - Size can be any positive integer\n              - Model-Index:\n                 0: Open-1D\n                 1: Periodic-1D\n                 2: Open-2D\n                 3: Periodic-2D\n              - Algorithm-Index:\n                 0: SSE - Stochastic Series Expansion\n                 1: ED  - Exact Diagonalization\n              - Temperatures should be positive floats (use the dot as delimiter)";
 
     int size                     = atoi(argv[1]);
     int modelIndex               = atoi(argv[2]);
@@ -22,10 +22,10 @@ int main(int argc, char *argv[]) {
     long double endTemperature   = atof(argv[5]);
     long double temperatureStep  = atof(argv[6]);
     
+    if(size <= 0) throw "[QHS] Error: The Size has to be positive";
+    
     AbstractModel* model;
     const char* modelLabel;
-    AbstractAlgorithm* algorithm;
-    const char* algorithmLabel;
     
     switch(modelIndex) {
     
@@ -53,6 +53,9 @@ int main(int argc, char *argv[]) {
         throw "[QHS] Error: The Model-Index has to be within [0;3]";
     
     }
+    
+    AbstractAlgorithm* algorithm;
+    const char* algorithmLabel;
 
     switch(algorithmIndex) {
     
@@ -70,7 +73,10 @@ int main(int argc, char *argv[]) {
         throw "[QHS] Error: The Algorithm-Index has to be within [0;1]";
     
     }
-
+    
+    if(startTemperature <= 0) throw "[QHS] Error: The Start-Temperature has to be positive";
+    if(endTemperature   <= 0) throw "[QHS] Error: The End-Temperature has to be positive";
+    if(temperatureStep  <= 0) throw "[QHS] Error: The Temperature-Step has to be positive";
     if(startTemperature > endTemperature) std::swap(startTemperature, endTemperature);
     
     printf("#\n");
