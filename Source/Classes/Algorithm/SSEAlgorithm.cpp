@@ -171,6 +171,9 @@ class SSEAlgorithm : public AbstractAlgorithm {
         }
       
       }
+      
+      delete[] vLast;
+      delete[] vFirst;
     
     };
     
