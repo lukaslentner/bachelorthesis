@@ -95,25 +95,27 @@ class EDAlgorithm : public AbstractAlgorithm {
     
     void runTemperatureRound() {
 
+      double sumOfE        = 0;
+      double sumOfESquared = 0;
+      double z             = 0;
+    
+      //gruppieren
+      //bs goes until g.countbs
+
       TNT::Array2D<double> h(twoPowN, twoPowN, 0.0);
-      TNT::Array2D<double> d(twoPowN, twoPowN, 0.0);
+      TNT::Array1D<double> ev(twoPowN, 0.0);
 
       for(int bs = 0; bs < twoPowN; bs++) {
         hAction(h, bs);
       }
 
       JAMA::Eigenvalue<double> e(h);
-  
-      e.getD(d);
-
-      double sumOfE        = 0;
-      double sumOfESquared = 0;
-      double z             = 0;
+      e.getRealEigenvalues(ev);
 
       for(int bs = 0; bs < twoPowN; bs++) {
-        sumOfE        += exp(-h[bs][bs] / t) * h[bs][bs];
-        sumOfESquared += exp(-h[bs][bs] / t) * pow(h[bs][bs], 2);
-        z             += exp(-h[bs][bs] / t);
+        sumOfE        += exp(-ev[bs] / t) * ev[bs];
+        sumOfESquared += exp(-ev[bs] / t) * pow(ev[bs], 2);
+        z             += exp(-ev[bs] / t);
       }
       
       avE = sumOfE / z;
@@ -121,6 +123,25 @@ class EDAlgorithm : public AbstractAlgorithm {
       avC = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
       erC = 0;
       
+    };
+    
+    std::string dumpMatrix(TNT::Array2D<double> a_parameter) {
+    
+      std::stringstream out;
+    
+      for(int i = 0; i < a_parameter.dim1(); i++) {
+        out << "[";
+        for(int j = 0; j < a_parameter.dim2(); j++) {
+          if(j != 0) out << " ";
+          char c[20];
+          sprintf(c, "%+4e", a_parameter[i][j]);
+          out << c;
+        }
+        out << "]" << std::endl;
+      }
+      
+      return out.str();
+    
     };
     
 };

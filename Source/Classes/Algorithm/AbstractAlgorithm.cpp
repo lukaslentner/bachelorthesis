@@ -60,13 +60,13 @@ class AbstractAlgorithm {
     
     };
     
-    std::string intArrayToString(int *a, int c) {
+    std::string intArrayToString(int *a_parameter, int c_parameter) {
     
       std::stringstream out;
     
-      for(int i = 0; i < c; i++) {
+      for(int i = 0; i < c_parameter; i++) {
         if(i != 0) out << ",";
-        out << a[i];
+        out << a_parameter[i];
       }
       
       return out.str();
