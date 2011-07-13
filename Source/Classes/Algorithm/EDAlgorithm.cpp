@@ -11,118 +11,88 @@ class EDAlgorithm : public AbstractAlgorithm {
   protected:
   
     int twoPowN;
-    
-    void hAction(TNT::Array2D<double> h, int bs) {
-    
-      int tempBs;
+
+    void hAction(TNT::Array2D<double> h, int s, TNT::Array1D<int> mapS) {
+
+      int tempS;
       double value;
 
       for(int b = 1; b <= model->getNb(); b++) {
       
-        tempBs = bs;
+        tempS = s;
         value = 1;
-        szAction(model->getI2(b), &tempBs, &value);
-        szAction(model->getI1(b), &tempBs, &value);
-        if(tempBs >= 0) h[bs][tempBs] += value;
+        szAction(model->getI2(b), &tempS, &value);
+        szAction(model->getI1(b), &tempS, &value);
+        if(tempS >= 0) h[mapS[s]][mapS[tempS]] += value;
         
-        tempBs = bs;
+        tempS = s;
         value = 0.5;
-        smAction(model->getI2(b), &tempBs, &value);
-        spAction(model->getI1(b), &tempBs, &value);
-        if(tempBs >= 0) h[bs][tempBs] += value;
+        smAction(model->getI2(b), &tempS, &value);
+        spAction(model->getI1(b), &tempS, &value);
+        if(tempS >= 0) h[mapS[s]][mapS[tempS]] += value;
         
-        tempBs = bs;
+        tempS = s;
         value = 0.5;
-        spAction(model->getI2(b), &tempBs, &value);
-        smAction(model->getI1(b), &tempBs, &value);
-        if(tempBs >= 0) h[bs][tempBs] += value;
+        spAction(model->getI2(b), &tempS, &value);
+        smAction(model->getI1(b), &tempS, &value);
+        if(tempS >= 0) h[mapS[s]][mapS[tempS]] += value;
       
       }
       
     };
 
-    void szAction(int i, int* state_pointer, double* value_pointer) {
+    void szAction(int i, int* s_pointer, double* value_pointer) {
     
-      if(*state_pointer == -1) return;
+      if(*s_pointer == -1) return;
       
       *value_pointer *= 0.5;
 
-      if(~*state_pointer & (int) pow(2, i)) *value_pointer *= -1;
+      if(~*s_pointer & (int) pow(2, i)) *value_pointer *= -1;
 
     };
 
-    void spAction(int i, int* state_pointer, double* value_pointer) {
+    void spAction(int i, int* s_pointer, double* value_pointer) {
     
-      if(*state_pointer == -1) return;
+      if(*s_pointer == -1) return;
       
-      if(*state_pointer & (int) pow(2, i)) {
+      if(*s_pointer & (int) pow(2, i)) {
       
-        *state_pointer = -1;
+        *s_pointer = -1;
       
       } else {
       
-        *state_pointer ^= (int) pow(2, i);
+        *s_pointer ^= (int) pow(2, i);
       
       }
 
     };
 
-    void smAction(int i, int* state_pointer, double* value_pointer) {
+    void smAction(int i, int* s_pointer, double* value_pointer) {
     
-      if(*state_pointer == -1) return;
+      if(*s_pointer == -1) return;
       
-      if(*state_pointer & (int) pow(2, i)) {
+      if(*s_pointer & (int) pow(2, i)) {
       
-        *state_pointer ^= (int) pow(2, i);
+        *s_pointer ^= (int) pow(2, i);
       
       } else {
       
-        *state_pointer = -1;
+        *s_pointer = -1;
       
       }
 
     };
-
-  public:
     
-    EDAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
+    int getNumOf1Bits(int value) {
     
-      twoPowN = pow(2, model->getN());
-    
-    };
-    
-    ~EDAlgorithm() {};
-    
-    void runTemperatureRound() {
-
-      double sumOfE        = 0;
-      double sumOfESquared = 0;
-      double z             = 0;
-    
-      //gruppieren
-      //bs goes until g.countbs
-
-      TNT::Array2D<double> h(twoPowN, twoPowN, 0.0);
-      TNT::Array1D<double> ev(twoPowN, 0.0);
-
-      for(int bs = 0; bs < twoPowN; bs++) {
-        hAction(h, bs);
-      }
-
-      JAMA::Eigenvalue<double> e(h);
-      e.getRealEigenvalues(ev);
-
-      for(int bs = 0; bs < twoPowN; bs++) {
-        sumOfE        += exp(-ev[bs] / t) * ev[bs];
-        sumOfESquared += exp(-ev[bs] / t) * pow(ev[bs], 2);
-        z             += exp(-ev[bs] / t);
-      }
+      value = ((value & 0xaaaaaaaa) >> 1)  + (value & 0x55555555);
+      value = ((value & 0xcccccccc) >> 2)  + (value & 0x33333333);
+      value = ((value & 0xf0f0f0f0) >> 4)  + (value & 0x0f0f0f0f);
+      value = ((value & 0xff00ff00) >> 8)  + (value & 0x00ff00ff);
+      value = ((value & 0xffff0000) >> 16) + (value & 0x0000ffff);
       
-      avE = sumOfE / z;
-      erE = 0;
-      avC = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
-      erC = 0;
-      
+      return value;
+    
     };
     
     std::string dumpMatrix(TNT::Array2D<double> a_parameter) {
@@ -142,6 +112,63 @@ class EDAlgorithm : public AbstractAlgorithm {
       
       return out.str();
     
+    };
+
+  public:
+    
+    EDAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
+    
+      twoPowN = pow(2, model->getN());
+    
+    };
+    
+    ~EDAlgorithm() {};
+    
+    void runTemperatureRound() {
+
+      double sumOfE        = 0;
+      double sumOfESquared = 0;
+      double z             = 0;
+      
+      TNT::Array2D<int> mapSIndex(model->getN() + 1, twoPowN, -1); // 2nd dimension needs to be minimum "choose n/2 from n", but I was lazy ...
+      TNT::Array1D<int> mapS(twoPowN, -1);
+      TNT::Array1D<int> sIndexLength(model->getN() + 1, 0);
+      
+      int g;
+      for(int s = 0; s < twoPowN; s++) {
+
+        g = getNumOf1Bits(s);
+        mapSIndex[g][sIndexLength[g]] = s;
+        mapS[s] = sIndexLength[g];
+        sIndexLength[g]++;
+
+      }
+      
+      for(int g = 0; g <= model->getN(); g++) {
+      
+        TNT::Array2D<double> h(sIndexLength[g], sIndexLength[g], 0.0);
+        TNT::Array1D<double> e(sIndexLength[g], 0.0);
+        
+        for(int sIndex = 0; sIndex < sIndexLength[g]; sIndex++) {
+          hAction(h, mapSIndex[g][sIndex], mapS);
+        }
+        
+        JAMA::Eigenvalue<double> eFactory(h);
+        eFactory.getRealEigenvalues(e);
+        
+        for(int sIndex = 0; sIndex < sIndexLength[g]; sIndex++) {
+          sumOfE        += exp(-e[sIndex] / t) * e[sIndex];
+          sumOfESquared += exp(-e[sIndex] / t) * pow(e[sIndex], 2);
+          z             += exp(-e[sIndex] / t);
+        }
+      
+      }
+
+      avE = sumOfE / z;
+      erE = 0;
+      avC = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
+      erC = 0;
+      
     };
     
 };
