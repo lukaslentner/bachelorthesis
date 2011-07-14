@@ -1,6 +1,3 @@
-//TODO: Error binning (relaxationTime)
-//TODO: Regognize Thermalization
-
 #ifndef CLASS_SSEALGORITHM
 #define CLASS_SSEALGORITHM
 
@@ -19,7 +16,6 @@ class SSEAlgorithm : public AbstractAlgorithm {
     bool *spins;
     int nr;
     int countMeasurements;
-    int binSize;
     int lMax;
     int l;
     int *s;
@@ -47,14 +43,14 @@ class SSEAlgorithm : public AbstractAlgorithm {
 
           if(spins[model->getI1(b)] == spins[model->getI2(b)]) continue; // if bond-neighbour spins are parallel -> go to next p
           
-          if(gsl_rng_uniform(generator) < ((long double) model->getNb()) / (long double) 2 / (l - nr) / t) {
+          if(gsl_rng_uniform(generator) < ((double) model->getNb()) / 2 / (l - nr) / t) {
             s[p] = 2 * b;
             nr++;
           }
 
         } else if(s[p] % 2 == 0) { // Diagonal operator -> try to remove
         
-          if(gsl_rng_uniform(generator) < (long double) 2 * (l - nr + 1) * t / model->getNb()) {
+          if(gsl_rng_uniform(generator) < (double) 2 * (l - nr + 1) * t / model->getNb()) {
             s[p] = 0;
             nr--;
           }
@@ -177,6 +173,56 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
     };
     
+    int getRelaxationTime() {
+    
+      const int relaxationTimeTryTime = 50;
+      int relaxationTime;
+      
+      double sumOfNr = 0;
+      double sumOfNrSquared = 0;
+      double *nrWhileTrying = new double[relaxationTimeTryTime];
+    
+      for(int time = 0; time < relaxationTimeTryTime; time++) {
+      
+        nrWhileTrying[time] = nr;
+        doSweep();
+        
+        sumOfNr += nrWhileTrying[time];
+        sumOfNrSquared += pow(nrWhileTrying[time], 2);
+      
+      }
+      
+      double autoCorrelation;
+    
+      for(relaxationTime = 0; relaxationTime < relaxationTimeTryTime; relaxationTime++) {
+    
+        autoCorrelation = 0;
+      
+        for(int i = 0; i < relaxationTimeTryTime - relaxationTime; i++) {
+          autoCorrelation += nrWhileTrying[i] * nrWhileTrying[i + relaxationTime];
+        }
+      
+        autoCorrelation *= pow(t, 2);
+        autoCorrelation /= relaxationTimeTryTime - relaxationTime;
+        autoCorrelation = (autoCorrelation - pow(sumOfNr * t / relaxationTimeTryTime, 2)) / ((sumOfNrSquared * pow(t, 2) / relaxationTimeTryTime) - pow(sumOfNr * t / relaxationTimeTryTime, 2));
+        
+        if(isnan(autoCorrelation)) {
+          printf("# Temperatures underneeth %+20.13e were not measured, due to the unknown relaxation time\n", t);
+          throw "Stop execution due to problems to determine the relaxation time";
+        };
+        
+        if(autoCorrelation < exp((double) -1)) {
+          //delete nrWhileTrying;
+          return relaxationTime;
+        }
+    
+      }
+      
+      printf("# Temperatures underneeth %+20.13e were not measured, due to the unknown relaxation time\n", t);
+      throw "Stop execution due to problems to determine the relaxation time";
+    
+    };
+    
   public:
     
     SSEAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
@@ -189,8 +235,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
       spins = new bool[model->getN()];
       for(int i = 0; i < model->getN(); i++) spins[i] = gsl_rng_uniform_int(generator, 2);
       nr = 0;
-      countMeasurements = 100;
-      binSize = 1000;
+      countMeasurements = 10000;
       lMax = 10000;
       l = 10;
       s = new int[lMax];
@@ -211,16 +256,19 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
     void runTemperatureRound() {
       
-      long double sumOfNr = 0; 
-      long double sumOfNrSquared = 0;
-      long double tempSumOfNr = 0; 
-      long double tempSumOfNrSquared = 0;
+      double sumOfNr = 0; 
+      double sumOfNrSquared = 0;
+      double tempSumOfNr = 0; 
+      double tempSumOfNrSquared = 0;
       
-      for(int j = 0; j < 10000; j++) {
+      int relaxationTime = getRelaxationTime();
+      int binSize = 10 * relaxationTime;
+
+      for(int j = 0; j < 1000; j++) {
         doSweep();
       }
       
-      for(int i = 0; i < binSize * countMeasurements; i += binSize) {
+      for(long i = 0; i < (long) binSize * countMeasurements; i += binSize) {
       
         tempSumOfNr = 0; 
         tempSumOfNrSquared = 0;
@@ -239,10 +287,9 @@ class SSEAlgorithm : public AbstractAlgorithm {
         
       }
       
-      avE = (-sumOfNr * t / countMeasurements) + ((long double) model->getNb() / 4);
-      erE = 0;
+      avE = (-sumOfNr * t / countMeasurements) + ((double) model->getNb() / 4);
+      erE = sqrt(((sumOfNrSquared * pow(t, 2) / countMeasurements) - pow(sumOfNr * t / countMeasurements, 2)) / (countMeasurements - 1));
       avC = (sumOfNrSquared / countMeasurements) - pow(sumOfNr / countMeasurements, 2) - (sumOfNr / countMeasurements);
-      erC = 0;
     
     };
 

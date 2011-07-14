@@ -15,7 +15,7 @@ class Periodic2DModel : public AbstractModel {
     
     Periodic2DModel(int n_parameter) : AbstractModel(n_parameter) {
     
-      m = sqrt((float) n_parameter);
+      m = sqrt((double) n_parameter);
       if(pow((int) m, 2) != n_parameter) throw "[Periodic2DModel] Error: You choose a 2D model, please input a square number as n";
     
     };

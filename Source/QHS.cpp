@@ -18,9 +18,9 @@ int main(int argc, char *argv[]) {
     int size                     = atoi(argv[1]);
     int modelIndex               = atoi(argv[2]);
     int algorithmIndex           = atoi(argv[3]);
-    long double startTemperature = atof(argv[4]);
-    long double endTemperature   = atof(argv[5]);
-    long double temperatureStep  = atof(argv[6]);
+    double startTemperature = atof(argv[4]);
+    double endTemperature   = atof(argv[5]);
+    double temperatureStep  = atof(argv[6]);
     
     if(size <= 0) throw "[QHS] Error: The Size has to be positive";
     
@@ -87,37 +87,35 @@ int main(int argc, char *argv[]) {
     printf("# Size                 = %+19.19i\n", size);
     printf("# Model                = %s\n", modelLabel);
     printf("# Algorithm            = %s\n", algorithmLabel);
-    printf("# Start-Temperature    = %+20.13Le\n", startTemperature);
-    printf("# End-Temperature      = %+20.13Le\n", endTemperature);
-    printf("# Temperature-Step     = %+20.13Le\n", temperatureStep);
+    printf("# Start-Temperature    = %+20.13e\n", startTemperature);
+    printf("# End-Temperature      = %+20.13e\n", endTemperature);
+    printf("# Temperature-Step     = %+20.13e\n", temperatureStep);
     printf("#\n");
-    printf("# %-17s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s\n",
+    printf("# %-17s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s\n",
            "Size",
            "Model-Index",
            "Algorithm-Index",
            "Temperature",
            "AverageEnergy",
            "StdDvOfEnergy",
-           "AverageCHeat",
-           "StdDvOfCHeat");
+           "AverageCHeat");
     printf("# ------------------------------------------------------------------------------------------------------\n");
 
-    for(long double temperature = endTemperature; temperature > startTemperature + (temperatureStep / 2); temperature -= temperatureStep) {
+    for(double temperature = endTemperature; temperature > startTemperature + (temperatureStep / 2); temperature -= temperatureStep) {
     
       algorithm->setTemperature(temperature);
       algorithm->runTemperatureRound();
       
       std::cerr << "[QHS] Info: Size=" << size << ", Model=" << modelLabel << ", Algorithm=" << algorithmLabel << ", Temperature=" << temperature << std::endl;
       
-      printf("%+19.19i|%+19.19i|%+19.19i|%+20.13Le|%+20.13Le|%+20.13Le|%+20.13Le|%+20.13Le\n",
+      printf("%+19.19i|%+19.19i|%+19.19i|%+20.13e|%+20.13e|%+20.13e|%+20.13e\n",
              size,
              modelIndex,
              algorithmIndex,
              temperature,
              algorithm->getAverageEnergy(),
              algorithm->getStdDvOfEnergy(),
-             algorithm->getAverageCHeat(),
-             algorithm->getStdDvOfCHeat());
+             algorithm->getAverageCHeat());
 
     }
     

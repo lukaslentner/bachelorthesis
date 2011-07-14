@@ -47,7 +47,7 @@ class EDAlgorithm : public AbstractAlgorithm {
       
       *value_pointer *= 0.5;
 
-      if(~*s_pointer & (int) pow(2, i)) *value_pointer *= -1;
+      if(~*s_pointer & (int(1) << i)) *value_pointer *= -1;
 
     };
 
@@ -55,13 +55,13 @@ class EDAlgorithm : public AbstractAlgorithm {
     
       if(*s_pointer == -1) return;
       
-      if(*s_pointer & (int) pow(2, i)) {
+      if(*s_pointer & (int(1) << i)) {
       
         *s_pointer = -1;
       
       } else {
       
-        *s_pointer ^= (int) pow(2, i);
+        *s_pointer ^= int(1) << i;
       
       }
 
@@ -71,9 +71,9 @@ class EDAlgorithm : public AbstractAlgorithm {
     
       if(*s_pointer == -1) return;
       
-      if(*s_pointer & (int) pow(2, i)) {
+      if(*s_pointer & (int(1) << i)) {
       
-        *s_pointer ^= (int) pow(2, i);
+        *s_pointer ^= int(1) << i;
       
       } else {
       
@@ -94,31 +94,12 @@ class EDAlgorithm : public AbstractAlgorithm {
       return value;
     
     };
-    
-    std::string dumpMatrix(TNT::Array2D<double> a_parameter) {
-    
-      std::stringstream out;
-    
-      for(int i = 0; i < a_parameter.dim1(); i++) {
-        out << "[";
-        for(int j = 0; j < a_parameter.dim2(); j++) {
-          if(j != 0) out << " ";
-          char c[20];
-          sprintf(c, "%+4e", a_parameter[i][j]);
-          out << c;
-        }
-        out << "]" << std::endl;
-      }
-      
-      return out.str();
-    
-    };
 
   public:
     
     EDAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
     
-      twoPowN = pow(2, model->getN());
+      twoPowN = int(1) << model->getN();
     
     };
     
@@ -167,7 +148,6 @@ class EDAlgorithm : public AbstractAlgorithm {
       avE = sumOfE / z;
       erE = 0;
       avC = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
-      erC = 0;
       
     };
     

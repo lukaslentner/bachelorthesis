@@ -15,7 +15,7 @@ class Open2DModel : public AbstractModel {
     
     Open2DModel(int n_parameter) : AbstractModel(n_parameter) {
     
-      m = sqrt((float) n_parameter);
+      m = sqrt((double) n_parameter);
       if(pow((int) m, 2) != n_parameter) throw "[Open2DModel] Error: You choose a 2D model, please input a square number as n";
     
     };
