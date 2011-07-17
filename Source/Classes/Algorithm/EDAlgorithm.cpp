@@ -11,84 +11,29 @@ class EDAlgorithm : public AbstractAlgorithm {
   protected:
   
     int twoPowN;
+    TNT::Array1D<double> *e;
 
-    void hAction(TNT::Array2D<double> h, int s, TNT::Array1D<int> mapS) {
-
-      int tempS;
-      double value;
+    void hAction(TNT::Array2D<double> hg, int s, TNT::Array1D<int> mapS) {
 
       for(int b = 1; b <= model->getNb(); b++) {
-      
-        tempS = s;
-        value = 1;
-        szAction(model->getI2(b), &tempS, &value);
-        szAction(model->getI1(b), &tempS, &value);
-        if(tempS >= 0) h[mapS[s]][mapS[tempS]] += value;
+
+        bool i1Up = s & (int(1) << model->getI1(b));
+        bool i2Up = s & (int(1) << model->getI2(b));
         
-        tempS = s;
-        value = 0.5;
-        smAction(model->getI2(b), &tempS, &value);
-        spAction(model->getI1(b), &tempS, &value);
-        if(tempS >= 0) h[mapS[s]][mapS[tempS]] += value;
+        hg[mapS[s]][mapS[s]] += i1Up == i2Up ? 0.25 : -0.25;
         
-        tempS = s;
-        value = 0.5;
-        spAction(model->getI2(b), &tempS, &value);
-        smAction(model->getI1(b), &tempS, &value);
-        if(tempS >= 0) h[mapS[s]][mapS[tempS]] += value;
+        if(i1Up != i2Up) hg[mapS[s]][mapS[s ^ (int(1) << model->getI1(b)) ^ (int(1) << model->getI2(b))]] += 0.5;
       
       }
       
-    };
-
-    void szAction(int i, int* s_pointer, double* value_pointer) {
-    
-      if(*s_pointer == -1) return;
-      
-      *value_pointer *= 0.5;
-
-      if(~*s_pointer & (int(1) << i)) *value_pointer *= -1;
-
-    };
-
-    void spAction(int i, int* s_pointer, double* value_pointer) {
-    
-      if(*s_pointer == -1) return;
-      
-      if(*s_pointer & (int(1) << i)) {
-      
-        *s_pointer = -1;
-      
-      } else {
-      
-        *s_pointer ^= int(1) << i;
-      
-      }
-
-    };
-
-    void smAction(int i, int* s_pointer, double* value_pointer) {
-    
-      if(*s_pointer == -1) return;
-      
-      if(*s_pointer & (int(1) << i)) {
-      
-        *s_pointer ^= int(1) << i;
-      
-      } else {
-      
-        *s_pointer = -1;
-      
-      }
-
     };
     
     int getNumOf1Bits(int value) {
     
-      value = ((value & 0xaaaaaaaa) >> 1)  + (value & 0x55555555);
-      value = ((value & 0xcccccccc) >> 2)  + (value & 0x33333333);
-      value = ((value & 0xf0f0f0f0) >> 4)  + (value & 0x0f0f0f0f);
-      value = ((value & 0xff00ff00) >> 8)  + (value & 0x00ff00ff);
+      value = ((value & 0xaaaaaaaa) >> 1 ) + (value & 0x55555555);
+      value = ((value & 0xcccccccc) >> 2 ) + (value & 0x33333333);
+      value = ((value & 0xf0f0f0f0) >> 4 ) + (value & 0x0f0f0f0f);
+      value = ((value & 0xff00ff00) >> 8 ) + (value & 0x00ff00ff);
       value = ((value & 0xffff0000) >> 16) + (value & 0x0000ffff);
       
       return value;
@@ -100,49 +45,66 @@ class EDAlgorithm : public AbstractAlgorithm {
     EDAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
     
       twoPowN = int(1) << model->getN();
-    
-    };
-    
-    ~EDAlgorithm() {};
-    
-    void runTemperatureRound() {
-
-      double sumOfE        = 0;
-      double sumOfESquared = 0;
-      double z             = 0;
       
-      TNT::Array2D<int> mapSIndex(model->getN() + 1, twoPowN, -1); // 2nd dimension needs to be minimum "choose n/2 from n", but I was lazy ...
-      TNT::Array1D<int> mapS(twoPowN, -1);
+      TNT::Array2D<int> mapSIndex(model->getN() + 1, twoPowN, 0); // 2nd dimension needs to be minimum "choose n/2 from n", but I was lazy ...
+      TNT::Array1D<int> mapS(twoPowN, 0);
       TNT::Array1D<int> sIndexLength(model->getN() + 1, 0);
       
-      int g;
+      e = new TNT::Array1D<double>(twoPowN, 0.0);
+      int eIndex = 0;
+      
       for(int s = 0; s < twoPowN; s++) {
-
-        g = getNumOf1Bits(s);
+        int g = getNumOf1Bits(s);
         mapSIndex[g][sIndexLength[g]] = s;
         mapS[s] = sIndexLength[g];
         sIndexLength[g]++;
-
       }
       
-      for(int g = 0; g <= model->getN(); g++) {
+      for(int g = 0; g <= model->getN() / 2; g++) {
       
-        TNT::Array2D<double> h(sIndexLength[g], sIndexLength[g], 0.0);
-        TNT::Array1D<double> e(sIndexLength[g], 0.0);
+        TNT::Array2D<double> hg(sIndexLength[g], sIndexLength[g], 0.0);
+        TNT::Array1D<double> eg(sIndexLength[g], 0.0);
         
         for(int sIndex = 0; sIndex < sIndexLength[g]; sIndex++) {
-          hAction(h, mapSIndex[g][sIndex], mapS);
+          hAction(hg, mapSIndex[g][sIndex], mapS);
         }
         
-        JAMA::Eigenvalue<double> eFactory(h);
-        eFactory.getRealEigenvalues(e);
+        std::cerr << "Diagonalize matrix " << (g + 1) << " von " << ((model->getN() / 2) + 1) << " [" << sIndexLength[g] << "²]" << std::endl;
+        
+        JAMA::Eigenvalue<double> eFactory(hg);
+        eFactory.getRealEigenvalues(eg);
         
         for(int sIndex = 0; sIndex < sIndexLength[g]; sIndex++) {
-          sumOfE        += exp(-e[sIndex] / t) * e[sIndex];
-          sumOfESquared += exp(-e[sIndex] / t) * pow(e[sIndex], 2);
-          z             += exp(-e[sIndex] / t);
+        
+          (*e)[eIndex] = eg[sIndex];
+          eIndex++;
+          if(model->getN() % 2 != 0 || g != model->getN() / 2) {
+            (*e)[eIndex] = eg[sIndex];
+            eIndex++;
+          }
         }
       
+      }
+    
+    };
+    
+    ~EDAlgorithm() {
+    
+      delete e;
+    
+    };
+    
+    void runTemperatureRound() {
+
+      double sumOfE = 0;
+      double sumOfESquared = 0;
+      double z = 0;
+      
+      for(int s = 0; s < twoPowN; s++) {
+        double weight = exp(-(*e)[s] / t);
+        sumOfE += weight * (*e)[s];
+        sumOfESquared += weight * pow((*e)[s], 2);
+        z += weight;
       }
 
       avE = sumOfE / z;

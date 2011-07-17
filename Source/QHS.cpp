@@ -15,13 +15,13 @@ int main(int argc, char *argv[]) {
 
     if(argc != 7) throw "[QHS] Error: Please specify 6 parameters (Size, Model-Index, Algorithm-Index, Start-Temperature, End-Temperature, Temperature-Step)\n              - Size can be any positive integer\n              - Model-Index:\n                 0: Open-1D\n                 1: Periodic-1D\n                 2: Open-2D\n                 3: Periodic-2D\n              - Algorithm-Index:\n                 0: SSE - Stochastic Series Expansion\n                 1: ED  - Exact Diagonalization\n              - Temperatures should be positive floats (use the dot as delimiter)";
 
-    int size                     = atoi(argv[1]);
-    int modelIndex               = atoi(argv[2]);
-    int algorithmIndex           = atoi(argv[3]);
+    int size                = atoi(argv[1]);
+    int modelIndex          = atoi(argv[2]);
+    int algorithmIndex      = atoi(argv[3]);
     double startTemperature = atof(argv[4]);
     double endTemperature   = atof(argv[5]);
     double temperatureStep  = atof(argv[6]);
-    
+
     if(size <= 0) throw "[QHS] Error: The Size has to be positive";
     
     AbstractModel* model;

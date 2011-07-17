@@ -14,12 +14,12 @@ class SSEAlgorithm : public AbstractAlgorithm {
     gsl_rng *generator;
 
     bool *spins;
-    int nr;
+    long nr;
     int countMeasurements;
-    int lMax;
-    int l;
+    long lMax;
+    long l;
     int *s;
-    int *x;
+    long *x;
     
     void doSweep() {
       
@@ -28,6 +28,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
       doOperatorLoopUpdate();
       
       if(l < 4 * nr / 3) l = 4 * nr / 3;
+      if(l > lMax) throw "Reached lMax";
     
     };
     
@@ -35,7 +36,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
       int b;
     
-      for(int p = 0; p < l; p++) {
+      for(long p = 0; p < l; p++) {
       
         if(s[p] == 0) { // No operator -> try to insert
 
@@ -71,19 +72,19 @@ class SSEAlgorithm : public AbstractAlgorithm {
     void doOperatorLoopUpdate() {
     
       // Construct link list x
-      int v0;
+      long v0;
       int b;
       int i1;
       int i2;
 
-      int *vFirst = new int[model->getN()];
+      long *vFirst = new long[model->getN()];
       for(int i = 0; i < model->getN(); i++) vFirst[i] = -1;
-      int *vLast = new int[model->getN()];
+      long *vLast = new long[model->getN()];
       for(int i = 0; i < model->getN(); i++) vLast[i]  = -1;
       
-      for(int v = 0; v < 4 * l; v++) x[v] = -1;
+      for(long v = 0; v < 4 * l; v++) x[v] = -1;
       
-      for(int p = 0; p < l; p++) {
+      for(long p = 0; p < l; p++) {
       
         if(s[p] == 0) continue; // No operator -> go to next p
         
@@ -125,22 +126,18 @@ class SSEAlgorithm : public AbstractAlgorithm {
       }
     
       // Do the actual update
-      int vT;
-      bool flipping;
-      int p;
-        
-      for(int v = 0; v < 4 * l; v += 2) {
+      for(long v = 0; v < 4 * l; v += 2) {
       
         if(x[v] < 0) continue;
         
-        vT = v;
-        flipping = gsl_rng_uniform(generator) < 0.5;
+        long vT = v;
+        bool flipping = gsl_rng_uniform(generator) < 0.5;
         
         while(x[vT] >= 0) {
         
           // Flip
           if(flipping) {
-            p = vT / 4;
+            long p = vT / 4;
             s[p] = s[p] ^ 1;
           }
           
@@ -212,7 +209,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
         };
         
         if(autoCorrelation < exp((double) -1)) {
-          //delete nrWhileTrying;
+          delete nrWhileTrying;
           return relaxationTime;
         }
     
@@ -236,11 +233,11 @@ class SSEAlgorithm : public AbstractAlgorithm {
       for(int i = 0; i < model->getN(); i++) spins[i] = gsl_rng_uniform_int(generator, 2);
       nr = 0;
       countMeasurements = 10000;
-      lMax = 10000;
+      lMax = 10000000;
       l = 10;
       s = new int[lMax];
-      for(int p = 0; p < lMax; p++) s[p] = 0;
-      x = new int[4 * lMax];
+      for(long p = 0; p < lMax; p++) s[p] = 0;
+      x = new long[4 * lMax];
     
     };
     
@@ -262,18 +259,18 @@ class SSEAlgorithm : public AbstractAlgorithm {
       double tempSumOfNrSquared = 0;
       
       int relaxationTime = getRelaxationTime();
-      int binSize = 10 * relaxationTime;
+      long binSize = 10 * relaxationTime;
 
       for(int j = 0; j < 1000; j++) {
         doSweep();
       }
       
-      for(long i = 0; i < (long) binSize * countMeasurements; i += binSize) {
+      for(long i = 0; i < binSize * countMeasurements; i += binSize) {
       
         tempSumOfNr = 0; 
         tempSumOfNrSquared = 0;
       
-        for(int j = 0; j < binSize; j++) {
+        for(long j = 0; j < binSize; j++) {
         
           doSweep();
             
