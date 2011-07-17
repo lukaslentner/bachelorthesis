@@ -91,15 +91,21 @@ int main(int argc, char *argv[]) {
     printf("# End-Temperature      = %+20.13e\n", endTemperature);
     printf("# Temperature-Step     = %+20.13e\n", temperatureStep);
     printf("#\n");
-    printf("# %-17s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s\n",
+    printf("# %-17s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s\n",
            "Size",
            "Model-Index",
            "Algorithm-Index",
            "Temperature",
            "AverageEnergy",
            "StdDvOfEnergy",
-           "AverageCHeat");
-    printf("# ------------------------------------------------------------------------------------------------------\n");
+           "AutoCOfEnergy",
+           "AverageCHeat",
+           "StdDvOfCHeat",
+           "AutoCOfCHeat",
+           "AverageSuscept",
+           "StdDvOfSuscept",
+           "AutoCOfSuscept");
+    printf("# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 
     for(double temperature = endTemperature; temperature > startTemperature + (temperatureStep / 2); temperature -= temperatureStep) {
     
@@ -108,14 +114,20 @@ int main(int argc, char *argv[]) {
       
       std::cerr << "[QHS] Info: Size=" << size << ", Model=" << modelLabel << ", Algorithm=" << algorithmLabel << ", Temperature=" << temperature << std::endl;
       
-      printf("%+19.19i|%+19.19i|%+19.19i|%+20.13e|%+20.13e|%+20.13e|%+20.13e\n",
+      printf("%+19.19i|%+19.19i|%+19.19i|%+20.13e|%+20.13e|%+20.13e|%+20.13e|%+20.13e|%+20.13e|%+20.13e|%+20.13e|%+20.13e|%+20.13e\n",
              size,
              modelIndex,
              algorithmIndex,
              temperature,
              algorithm->getAverageEnergy(),
              algorithm->getStdDvOfEnergy(),
-             algorithm->getAverageCHeat());
+             algorithm->getAutoCOfEnergy(),
+             algorithm->getAverageCHeat(),
+             algorithm->getStdDvOfCHeat(),
+             algorithm->getAutoCOfCHeat(),
+             algorithm->getAverageSuscept(),
+             algorithm->getStdDvOfSuscept(),
+             algorithm->getAutoCOfSuscept());
 
     }
     

@@ -15,7 +15,9 @@ class SSEAlgorithm : public AbstractAlgorithm {
 
     bool *spins;
     long nr;
-    int countMeasurements;
+    int energy_countBins;
+    int cHeat_countBins;
+    int suscept_countBins;
     long lMax;
     long l;
     int *s;
@@ -170,7 +172,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
     };
     
-    int getRelaxationTime() {
+    int getEnergyRelaxationTime() {
     
       const int relaxationTimeTryTime = 50;
       int relaxationTime;
@@ -232,7 +234,9 @@ class SSEAlgorithm : public AbstractAlgorithm {
       spins = new bool[model->getN()];
       for(int i = 0; i < model->getN(); i++) spins[i] = gsl_rng_uniform_int(generator, 2);
       nr = 0;
-      countMeasurements = 10000;
+      energy_countBins = 3000;
+      cHeat_countBins = 3000;
+      suscept_countBins = 3000;
       lMax = 10000000;
       l = 10;
       s = new int[lMax];
@@ -253,40 +257,74 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
     void runTemperatureRound() {
       
-      double sumOfNr = 0; 
-      double sumOfNrSquared = 0;
-      double tempSumOfNr = 0; 
-      double tempSumOfNrSquared = 0;
-      
-      int relaxationTime = getRelaxationTime();
-      long binSize = 10 * relaxationTime;
+      int energy_relaxationTime       = getEnergyRelaxationTime();
+      //int cHeat_relaxationTime        = getEnergyRelaxationTime();
+      //int suscept_relaxationTime      = getEnergyRelaxationTime();
+      long energy_measurementsPerBin  = 40 * energy_relaxationTime;
+      //long cHeat_measurementsPerBin   = 40 * energy_relaxationTime;
+      //long suscept_measurementsPerBin = 40 * energy_relaxationTime;
+      bool energy_finished  = false;
+      //bool cHeat_finished   = FALSE;
+      //bool suscept_finished = FALSE;
+      double *energy_perBin = new double[energy_countBins];
+      //double *cHeat_perBin      = new double[cHeat_countBins];
+      //double *suscept_perBin    = new double[suscept_countBins];
+      double energy_sumOfBin  = 0;
+      //double cHeat_sumOfBin   = 0;
+      //double suscept_sumOfBin = 0;
 
-      for(int j = 0; j < 1000; j++) {
+      for(int j = 0; j < 10000; j++) {
         doSweep();
       }
       
-      for(long i = 0; i < binSize * countMeasurements; i += binSize) {
+      double energy_sumOfNr        = 0;
+      //double sumOfNrSquared = 0;
       
-        tempSumOfNr = 0; 
-        tempSumOfNrSquared = 0;
+      for(unsigned long j = 0; j < long(1) << (sizeof(long) * 8 - 1); j++) {
       
-        for(long j = 0; j < binSize; j++) {
+        if(j % energy_measurementsPerBin == 0 && j != 0 && !energy_finished) {
         
-          doSweep();
-            
-          tempSumOfNr        += nr;
-          tempSumOfNrSquared += pow(nr, 2);
-
+          int bin = j / energy_measurementsPerBin;
+          energy_perBin[bin] = -energy_sumOfNr / energy_measurementsPerBin * t;
+          energy_sumOfBin += energy_perBin[bin];
+          energy_sumOfNr = 0;
+          
+          if(bin >= energy_countBins) energy_finished = true;
+        
         }
+      
+        energy_sumOfNr += nr;
         
-        sumOfNr        += tempSumOfNr        / binSize;
-        sumOfNrSquared += tempSumOfNrSquared / binSize;
+        doSweep();
+          
+//          sumOfNr        += nr;
+//          sumOfNrSquared += pow(nr, 2);
+
+        //binCHeat[bin]   = (sumOfNrSquared / measurementsPerBin) - pow(sumOfNr / measurementsPerBin, 2) - (sumOfNr / measurementsPerBin);
+        
+        //sumBinCHeats   += binCHeat[bin];
         
       }
       
-      avE = (-sumOfNr * t / countMeasurements) + ((double) model->getNb() / 4);
-      erE = sqrt(((sumOfNrSquared * pow(t, 2) / countMeasurements) - pow(sumOfNr * t / countMeasurements, 2)) / (countMeasurements - 1));
-      avC = (sumOfNrSquared / countMeasurements) - pow(sumOfNr / countMeasurements, 2) - (sumOfNr / countMeasurements);
+      avE = (energy_sumOfBin / energy_countBins) + ((double) model->getNb() / 4);
+      erE = 0;
+      for(long bin = 0; bin < energy_countBins; bin++) {
+        erE += pow(energy_perBin[bin] - avE, 2);
+      }
+      erE = sqrt(erE / energy_countBins / (energy_countBins - 1));
+      
+      //avC = (sumBinCHeats   / countBins);
+      //erC = 0;
+      //  erC += pow(binCHeat[bin]  - avC, 2);
+      //erC = sqrt(erC / countBins / (countBins - 1));
+      
+      //avE = (-sumOfNr * t / countBins) + ((double) model->getNb() / 4);
+      //erE = sqrt(((sumOfNrSquared * pow(t, 2) / countBins) - pow(sumOfNr * t / countBins, 2)) / (countBins - 1));
+      //avC = (sumOfNrSquared / countBins) - pow(sumOfNr / countBins, 2) - (sumOfNr / countBins);
+      
+      //delete suscept_perBin;
+      //delete cHeat_perBin;
+      delete energy_perBin;
     
     };
 
