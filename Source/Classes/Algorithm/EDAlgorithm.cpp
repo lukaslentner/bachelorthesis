@@ -108,8 +108,8 @@ class EDAlgorithm : public AbstractAlgorithm {
       }
 
       avE = sumOfE / z;
-      erE = 0;
-      avC = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
+      avH = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
+      //avS = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / t / model->getN();
       
     };
     

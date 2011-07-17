@@ -96,15 +96,15 @@ int main(int argc, char *argv[]) {
            "Model-Index",
            "Algorithm-Index",
            "Temperature",
-           "AverageEnergy",
-           "StdDvOfEnergy",
-           "AutoCOfEnergy",
-           "AverageCHeat",
-           "StdDvOfCHeat",
-           "AutoCOfCHeat",
-           "AverageSuscept",
-           "StdDvOfSuscept",
-           "AutoCOfSuscept");
+           "Average Energy",
+           "StdDv Of Energy",
+           "RelTi Of Energy",
+           "Average Heat",
+           "StdDv Of Heat",
+           "RelTi Of Heat",
+           "Average Suscept",
+           "StdDv Of Suscept",
+           "RelTi Of Suscept");
     printf("# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 
     for(double temperature = endTemperature; temperature > startTemperature + (temperatureStep / 2); temperature -= temperatureStep) {
@@ -121,13 +121,13 @@ int main(int argc, char *argv[]) {
              temperature,
              algorithm->getAverageEnergy(),
              algorithm->getStdDvOfEnergy(),
-             algorithm->getAutoCOfEnergy(),
-             algorithm->getAverageCHeat(),
-             algorithm->getStdDvOfCHeat(),
-             algorithm->getAutoCOfCHeat(),
+             algorithm->getRelTiOfEnergy(),
+             algorithm->getAverageHeat(),
+             algorithm->getStdDvOfHeat(),
+             algorithm->getRelTiOfHeat(),
              algorithm->getAverageSuscept(),
              algorithm->getStdDvOfSuscept(),
-             algorithm->getAutoCOfSuscept());
+             algorithm->getRelTiOfSuscept());
 
     }
     

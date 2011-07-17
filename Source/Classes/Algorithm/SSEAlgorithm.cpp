@@ -16,7 +16,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
     bool *spins;
     long nr;
     int energy_countBins;
-    int cHeat_countBins;
+    int heat_countBins;
     int suscept_countBins;
     long lMax;
     long l;
@@ -172,6 +172,18 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
     };
     
+    int getSpinSum() {
+    
+      int spinSum = 0;
+    
+      for(int i = 0; i < model->getN(); i++) {
+        spinSum += spins[i] ? 0.5 : -0.5;
+      }
+      
+      return spinSum;
+    
+    };
+    
     int getEnergyRelaxationTime() {
     
       const int relaxationTimeTryTime = 50;
@@ -198,16 +210,14 @@ class SSEAlgorithm : public AbstractAlgorithm {
         autoCorrelation = 0;
       
         for(int i = 0; i < relaxationTimeTryTime - relaxationTime; i++) {
-          autoCorrelation += nrWhileTrying[i] * nrWhileTrying[i + relaxationTime];
+          autoCorrelation += nrWhileTrying[i] * nrWhileTrying[i + relaxationTime] * pow(t, 2);
         }
-      
-        autoCorrelation *= pow(t, 2);
         autoCorrelation /= relaxationTimeTryTime - relaxationTime;
         autoCorrelation = (autoCorrelation - pow(sumOfNr * t / relaxationTimeTryTime, 2)) / ((sumOfNrSquared * pow(t, 2) / relaxationTimeTryTime) - pow(sumOfNr * t / relaxationTimeTryTime, 2));
         
         if(isnan(autoCorrelation)) {
-          printf("# Temperatures underneeth %+20.13e were not measured, due to the unknown relaxation time\n", t);
-          throw "Stop execution due to problems to determine the relaxation time";
+          printf("# Temperatures underneeth %+20.13e were not measured, due to the unknown energy relaxation time\n", t);
+          throw "Unknown energy relaxation time";
         };
         
         if(autoCorrelation < exp((double) -1)) {
@@ -217,8 +227,58 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
       }
       
-      printf("# Temperatures underneeth %+20.13e were not measured, due to the unknown relaxation time\n", t);
-      throw "Stop execution due to problems to determine the relaxation time";
+      printf("# Temperatures underneeth %+20.13e were not measured, because the maximal energy relaxation time was exceeded\n", t);
+      throw "The maximal energy relaxation time was exceeded";
+    
+    };
+    
+    int getHeatRelaxationTime() {
+    
+      const int relaxationTimeTryTime = 50;
+      int relaxationTime;
+      
+      double *sumOfNrWhileTrying        = new double[relaxationTimeTryTime];
+      double *sumOfNrSquaredWhileTrying = new double[relaxationTimeTryTime];
+    
+      for(int time = 0; time < relaxationTimeTryTime; time++) {
+      
+        sumOfNrWhileTrying[time]        = (time == 0 ? 0 : sumOfNrWhileTrying[time - 1]) + nr;
+        sumOfNrSquaredWhileTrying[time] = (time == 0 ? 0 : sumOfNrSquaredWhileTrying[time - 1]) + pow(nr, 2);
+      
+        doSweep();
+      
+      }
+    
+      for(relaxationTime = 0; relaxationTime < relaxationTimeTryTime - 1; relaxationTime++) {
+        
+        double sumOfAAa = 0;
+        double sumOfA = 0;
+        double sumOfASquared = 0;
+        for(int i = 1; i < relaxationTimeTryTime - relaxationTime; i++) {
+          sumOfAAa      +=    ((sumOfNrSquaredWhileTrying[i] / i) - pow(sumOfNrWhileTrying[i] / i, 2) - (sumOfNrWhileTrying[i] / i)) * ((sumOfNrSquaredWhileTrying[i + relaxationTime] / (i + relaxationTime)) - pow(sumOfNrWhileTrying[i + relaxationTime] / (i + relaxationTime), 2) - (sumOfNrWhileTrying[i + relaxationTime] / (i + relaxationTime)));
+          sumOfA        +=     (sumOfNrSquaredWhileTrying[i] / i) - pow(sumOfNrWhileTrying[i] / i, 2) - (sumOfNrWhileTrying[i] / i);
+          sumOfASquared += pow((sumOfNrSquaredWhileTrying[i] / i) - pow(sumOfNrWhileTrying[i] / i, 2) - (sumOfNrWhileTrying[i] / i), 2);
+        }
+        double autoCorrelation = ((sumOfAAa / (relaxationTimeTryTime - relaxationTime - 1)) - pow(sumOfA / (relaxationTimeTryTime - relaxationTime - 1), 2)) / ((sumOfASquared / (relaxationTimeTryTime - relaxationTime - 1)) - pow(sumOfA / (relaxationTimeTryTime - relaxationTime - 1), 2));
+        
+        std::cerr << sumOfAAa << "$" << sumOfA << "$" << sumOfASquared << " = " << autoCorrelation << std::endl;
+        std::cerr << relaxationTimeTryTime - relaxationTime << std::endl;
+        
+        if(isnan(autoCorrelation)) {
+          printf("# Temperatures underneeth %+20.13e were not measured, due to the unknown heat relaxation time\n", t);
+          throw "Unknown heat relaxation time";
+        };
+        
+        if(autoCorrelation < exp((double) -1)) {
+          delete sumOfNrSquaredWhileTrying;
+          delete sumOfNrWhileTrying;
+          return relaxationTime;
+        }
+    
+      }
+      
+      printf("# Temperatures underneeth %+20.13e were not measured, because the maximal heat relaxation time was exceeded\n", t);
+      throw "The maximal heat relaxation time was exceeded";
     
     };
     
@@ -234,8 +294,8 @@ class SSEAlgorithm : public AbstractAlgorithm {
       spins = new bool[model->getN()];
       for(int i = 0; i < model->getN(); i++) spins[i] = gsl_rng_uniform_int(generator, 2);
       nr = 0;
-      energy_countBins = 3000;
-      cHeat_countBins = 3000;
+      energy_countBins  = 3000;
+      heat_countBins    = 10;
       suscept_countBins = 3000;
       lMax = 10000000;
       l = 10;
@@ -257,52 +317,70 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
     void runTemperatureRound() {
       
-      int energy_relaxationTime       = getEnergyRelaxationTime();
-      //int cHeat_relaxationTime        = getEnergyRelaxationTime();
-      //int suscept_relaxationTime      = getEnergyRelaxationTime();
+      int energy_relaxationTime  = 3;//getEnergyRelaxationTime();
+      int heat_relaxationTime    = 3;//getHeatRelaxationTime();
+      int suscept_relaxationTime = 3;//getEnergyRelaxationTime();
+      
       long energy_measurementsPerBin  = 40 * energy_relaxationTime;
-      //long cHeat_measurementsPerBin   = 40 * energy_relaxationTime;
-      //long suscept_measurementsPerBin = 40 * energy_relaxationTime;
+      long heat_measurementsPerBin    = 4000 * heat_relaxationTime;
+      long suscept_measurementsPerBin = 40 * suscept_relaxationTime;
+      
       bool energy_finished  = false;
-      //bool cHeat_finished   = FALSE;
-      //bool suscept_finished = FALSE;
-      double *energy_perBin = new double[energy_countBins];
-      //double *cHeat_perBin      = new double[cHeat_countBins];
-      //double *suscept_perBin    = new double[suscept_countBins];
+      bool heat_finished    = false;
+      bool suscept_finished = false;
+      
+      double *energy_perBin  = new double[energy_countBins];
+      double *heat_perBin    = new double[heat_countBins];
+      double *suscept_perBin = new double[suscept_countBins];
+      
       double energy_sumOfBin  = 0;
-      //double cHeat_sumOfBin   = 0;
-      //double suscept_sumOfBin = 0;
+      double heat_sumOfBin    = 0;
+      double suscept_sumOfBin = 0;
 
       for(int j = 0; j < 10000; j++) {
         doSweep();
       }
       
-      double energy_sumOfNr        = 0;
-      //double sumOfNrSquared = 0;
+      double energy_sumOfNr              = 0;
+      double heat_sumOfNr                = 0;
+      double heat_sumOfNrSquared         = 0;
+      double suscept_sumOfSpinSumSquared = 0;
       
       for(unsigned long j = 0; j < long(1) << (sizeof(long) * 8 - 1); j++) {
       
         if(j % energy_measurementsPerBin == 0 && j != 0 && !energy_finished) {
-        
           int bin = j / energy_measurementsPerBin;
           energy_perBin[bin] = -energy_sumOfNr / energy_measurementsPerBin * t;
           energy_sumOfBin += energy_perBin[bin];
           energy_sumOfNr = 0;
-          
           if(bin >= energy_countBins) energy_finished = true;
-        
         }
       
-        energy_sumOfNr += nr;
+        if(j % heat_measurementsPerBin == 0 && j != 0 && !heat_finished) {
+          int bin = j / heat_measurementsPerBin;
+          heat_perBin[bin] = (heat_sumOfNrSquared / heat_measurementsPerBin) - pow(heat_sumOfNr / heat_measurementsPerBin, 2) - (heat_sumOfNr / heat_measurementsPerBin);
+          heat_sumOfBin += heat_perBin[bin];
+          heat_sumOfNr = 0;
+          heat_sumOfNrSquared = 0;
+          if(bin >= heat_countBins) heat_finished = true;
+        }
+      
+        if(j % suscept_measurementsPerBin == 0 && j != 0 && !suscept_finished) {
+          int bin = j / suscept_measurementsPerBin;
+          suscept_perBin[bin] = suscept_sumOfSpinSumSquared / suscept_measurementsPerBin / t / model->getN();
+          suscept_sumOfBin += suscept_perBin[bin];
+          suscept_sumOfSpinSumSquared = 0;
+          if(bin >= suscept_countBins) suscept_finished = true;
+        }
+      
+        energy_sumOfNr              += nr;
+        heat_sumOfNr                += nr;
+        heat_sumOfNrSquared         += pow(nr, 2);
+        suscept_sumOfSpinSumSquared += pow(getSpinSum(), 2);
         
         doSweep();
-          
-//          sumOfNr        += nr;
-//          sumOfNrSquared += pow(nr, 2);
-
-        //binCHeat[bin]   = (sumOfNrSquared / measurementsPerBin) - pow(sumOfNr / measurementsPerBin, 2) - (sumOfNr / measurementsPerBin);
         
-        //sumBinCHeats   += binCHeat[bin];
+        if(energy_finished && heat_finished && suscept_finished) break;
         
       }
       
@@ -312,18 +390,26 @@ class SSEAlgorithm : public AbstractAlgorithm {
         erE += pow(energy_perBin[bin] - avE, 2);
       }
       erE = sqrt(erE / energy_countBins / (energy_countBins - 1));
+      rtE = energy_relaxationTime;
       
-      //avC = (sumBinCHeats   / countBins);
-      //erC = 0;
-      //  erC += pow(binCHeat[bin]  - avC, 2);
-      //erC = sqrt(erC / countBins / (countBins - 1));
+      avH = (heat_sumOfBin / heat_countBins);
+      erH = 0;
+      for(long bin = 0; bin < heat_countBins; bin++) {
+        erH += pow(heat_perBin[bin]  - avH, 2);
+      }
+      erH = sqrt(erH / heat_countBins / (heat_countBins - 1));
+      rtH = heat_relaxationTime;
       
-      //avE = (-sumOfNr * t / countBins) + ((double) model->getNb() / 4);
-      //erE = sqrt(((sumOfNrSquared * pow(t, 2) / countBins) - pow(sumOfNr * t / countBins, 2)) / (countBins - 1));
-      //avC = (sumOfNrSquared / countBins) - pow(sumOfNr / countBins, 2) - (sumOfNr / countBins);
+      avS = (suscept_sumOfBin / suscept_countBins);
+      erS = 0;
+      for(long bin = 0; bin < suscept_countBins; bin++) {
+        erS += pow(suscept_perBin[bin]  - avS, 2);
+      }
+      erS = sqrt(erS / suscept_countBins / (suscept_countBins - 1));
+      rtS = suscept_relaxationTime;
       
-      //delete suscept_perBin;
-      //delete cHeat_perBin;
+      delete suscept_perBin;
+      delete heat_perBin;
       delete energy_perBin;
     
     };

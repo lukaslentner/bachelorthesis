@@ -12,13 +12,13 @@ class AbstractAlgorithm {
     double t;
     double avE;
     double erE;
-    double acE;
-    double avC;
-    double erC;
-    double acC;
+    double rtE;
+    double avH;
+    double erH;
+    double rtH;
     double avS;
     double erS;
-    double acS;
+    double rtS;
 
   public:
   
@@ -29,15 +29,15 @@ class AbstractAlgorithm {
       
       avE = 0;
       erE = 0;
-      acE = 0;
+      rtE = 0;
       
-      avC = 0;
-      erC = 0;
-      acC = 0;
+      avH = 0;
+      erH = 0;
+      rtH = 0;
       
       avS = 0;
       erS = 0;
-      acS = 0;
+      rtS = 0;
     
     };
 
@@ -61,27 +61,27 @@ class AbstractAlgorithm {
     
     };
     
-    double getAutoCOfEnergy() {
+    double getRelTiOfEnergy() {
     
-      return acE;
-    
-    };
-    
-    double getAverageCHeat() {
-    
-      return avC;
+      return rtE;
     
     };
     
-    double getStdDvOfCHeat() {
+    double getAverageHeat() {
     
-      return erC;
+      return avH;
     
     };
     
-    double getAutoCOfCHeat() {
+    double getStdDvOfHeat() {
     
-      return acC;
+      return erH;
+    
+    };
+    
+    double getRelTiOfHeat() {
+    
+      return rtH;
     
     };
     
@@ -97,9 +97,9 @@ class AbstractAlgorithm {
     
     };
     
-    double getAutoCOfSuscept() {
+    double getRelTiOfSuscept() {
     
-      return acS;
+      return rtS;
     
     };
     
