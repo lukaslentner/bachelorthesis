@@ -1,0 +1,81 @@
+\documentclass[a4paper, twoside, openright]{report}
+
+\usepackage[latin1]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{tabularx}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage[TS1, T1]{fontenc}
+\usepackage{lmodern, textcomp}
+\usepackage{listings}
+\usepackage[sumlimits, intlimits]{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{soul}
+
+\renewcommand{\date}{29. Juli 2011}
+
+\newcommand{\email}[1]{\href{mailto:#1}{\nolinkurl{#1}}}
+
+\renewcommand{\theenumi}{\alph{enumi}}
+\renewcommand{\labelenumi}{\theenumi)}
+\renewcommand{\theenumii}{\roman{enumii}}
+\renewcommand{\labelenumii}{\theenumii)}
+
+\lstnewenvironment{cppcode}[1][]{\lstset{basicstyle=\ttfamily\footnotesize,numberstyle=\ttfamily\tiny,language=c++,numbers=left,numbersep=8mm,xleftmargin=15mm,framextopmargin=1mm,framexleftmargin=5mm,framexbottommargin=1mm,captionpos=b,frame=trbl,#1}}{}
+
+\newcommand{\cppcodefile}[2][]{\lstinputlisting[basicstyle=\ttfamily\footnotesize,numberstyle=\ttfamily\tiny,language=c++,numbers=left,numbersep=8mm,xleftmargin=15mm,framextopmargin=1mm,framexleftmargin=5mm,framexbottommargin=1mm,captionpos=b,frame=trbl,#1]{#2}}
+
+\hypersetup{
+  pdfauthor   = {Lukas B. Lentner},
+  pdftitle    = {Stochastic Series Expansion: Quanten Monte-Carlo Simulation des Heisenberg Modells},
+  pdfsubject  = {Computergestützte numerische Physik},
+  pdfkeywords = {QMS, SSE, Heisenberg Modell, Monte-Carlo, Simulation Stochastic Series Expansion, Thermodynamik},
+  pdfcreator  = {LaTeX with hyperref package},
+  pdfproducer = {dvips + ps2pdf}
+}
+
+\include{A_Beispiele}
+
+%\includeonly{A_Inhaltsverzeichnis, Theorie, Klassisch, A_Literaturverzeichnis}
+
+\begin{document}
+
+\include{A_Titelseite}
+
+\include{Vorwort}
+
+\include{A_Inhaltsverzeichnis}
+
+%=======================================
+
+\include{Einleitung}
+
+\include{Theorie}
+
+\include{Klassisch}
+
+\include{SSE}
+
+\include{Zusammenfassung}
+
+\appendix
+
+\include{Quellcode}
+
+%=======================================
+
+\include{A_Abbildungsverzeichnis}
+
+\include{A_Tabellenverzeichnis}
+
+\include{A_Quellcodeverzeichnis}
+
+\include{A_Literaturverzeichnis}
+
+\end{document}

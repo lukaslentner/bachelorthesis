@@ -1,0 +1,38 @@
+\chapter*{Über dieses Schriftstück}
+\addcontentsline{toc}{chapter}{Über dieses Schriftstück}
+
+\section*{Kontaktdaten des Authors}
+
+\begingroup
+\leftskip=5mm
+Lukas Lentner\\
+St.-Cajetan-Straße 13\\
+D-81669 Munich
+
+\email{kontakt@lukaslentner.de}
+\par
+\endgroup
+
+\section*{Bachelorarbeit}
+
+Dieses Schriftstück wurde am \date als Bachelorarbeit an der Fakultät für Physik der Ludwig-Maximilians-Universität München eingereicht.
+
+\begingroup
+\leftskip=5mm
+Dr. Fabian Heidrich-Meisner\\
+Faculty of Physics\\
+Ludwig-Maximilians-Universität Munich
+
+\email{heidrich-meisner@lmu.de}
+\par
+\endgroup
+
+\section*{Assurance of Independence}
+
+I hereby proclaim that this document was written independently and only listed sources and auxiliary material were used.
+
+\vspace{10mm}
+\begin{tabular}{@{}p{40mm}@{\hspace{1mm}}l@{\hspace{1mm}}p{30mm}@{\hspace{6mm}}p{50mm}}
+\hrule&,&\hrule&\hrule\\[-3mm]
+Location&&Date&Signature\\
+\end{tabular}

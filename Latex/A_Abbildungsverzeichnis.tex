@@ -1,0 +1,6 @@
+\let\listfigurenamePARENT\listfigurename
+\renewcommand{\listfigurename}{\addcontentsline{toc}{chapter}{\listfigurenamePARENT}\listfigurenamePARENT}
+\begingroup
+\renewcommand*{\addvspace}[1]{}
+\listoffigures
+\endgroup
