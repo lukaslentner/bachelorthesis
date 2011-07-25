@@ -1,0 +1,86 @@
+\chapter[Klassische MCS am Beispiel des Ising Modells]{Klassische MCS\\\LARGE am Beispiel des Ising Modells}
+
+Um die Grundlagen einer Monte Carlo Simulation (MCS) kennenzulernen, wurde im Vorfeld eine Anwendung zur Simulation des 2-dimensionalen Ising-Modells mit periodischer Randbedingung erstellt. Die gewonnene Erfahrung erwies sich für das Studium der quantenmechanischen MCS als äußerst hilfreich.
+
+\section{Methode}
+
+\subsection{Das Ising-Modell}
+
+Für das klassische, ferromagnetische Ising-Modell ist der Hamiltonian
+
+\begin{equation}
+H_{\mathrm{Ising}}=-\sum_{\left\langle i,j\right\rangle}J_{ij}\cdot S_i^zS_j^z-B\mu\sum_{i=0}^{N-1}S_i^z
+\label{equ:isinghamiltonian}
+\end{equation}
+
+zusammengesetzt aus einer $z$-Koppelung benachbarter Spins $\left\langle i,j\right\rangle$ (wird später über das Gittermodell definiert), die durch die Bindungsmatrix $\boldsymbol{J}$ gewichtet wird, und einer magnetischen Wechselwirkung, in die das externe Magnetfeld $\boldsymbol{B}=(0,0,B)^T$ und das Magnetische Moment $\boldsymbol{\mu}=(0,0,\mu)^T$ eingeht. Für unser Beispiel setzten wir jedes $J_{ij}=1$ und betrachten die Anordnung ohne Magnetfeld -- da uns nur die $z$-Richtung interessiert setzen wir $S=S^z$. Der Hamiltonian erhält dann die vereinfachte Struktur,
+
+\begin{equation}
+H=-\sum_{\left\langle i,j\right\rangle}S_iS_j\ \mathrm{.}
+\label{equ:beispielisinghamiltonian}
+\end{equation}
+
+\subsection{Kanonische Übergangswahrscheinlichkeiten}
+
+Wegen der vorgegebenen Teilchenanzahl $N$ und Temperatur $T$ setzen wir für eine beliebige Größe $A$ den Mittelwert
+
+\begin{equation}
+\langle A\rangle =\sum_{\sigma\in\Omega}\frac{e^{-\beta E_\sigma}}{Z}\cdot A(\sigma )
+\label{equ:kanonischermittelwert}
+\end{equation}
+
+kanonisch an, wobei
+
+\begin{equation}
+Z=\sum_{\sigma\in\Omega}e^{-\beta E_\sigma}
+\label{equ:zustandssumme}
+\end{equation}
+
+die kanonische Zustandssumme, $\beta$ die reduzierte Temperatur $1/T$ und $E_\sigma$ die Energie eines gewissen mikroskopischen Zustandes $\sigma$ (Konfiguration) darstellt. Im Vergleich zur Gl. \ref{equ:mittelwert} sieht man, dass die Wahrscheinlichkeit eines Zustandes $\sigma$
+
+\begin{equation}
+p_\sigma=\frac{e^{-\beta E_\sigma}}{Z}
+\label{equ:kanonischewahrscheinlichkeit}
+\end{equation}
+
+boltzmannverteilt ist. Diese Gewichte sind schwer zu berechnen, da der Zustandsraum in solch einem Spin-System exponentiell mit der Spinanzahl anwächst ($\vert\Omega\vert\sim 2^N$). Machen wir allerdings vom Metropolis Algorithmus Gebrauch (siehe Gl. \ref{equ:metropolis}), benötigen wir die einzelnen Gewichte gar nicht, sondern können uns mit deren Verhältnissen, die dann die Übergangswahrscheinlichkeiten $\boldsymbol{W}$ darstellen, genügen,
+
+\begin{equation}
+W_{\nu\sigma}=\begin{cases}
+e^{-\beta(E\sigma-E_\nu)} & E\sigma>E_\nu\\
+1                         & E_\sigma\leq E_\nu\ \mathrm{.}
+\end{cases}
+\label{equ:kanonischermetropolis}
+\end{equation}
+
+\subsection{Messgrößen}
+
+Folgende typischen, thermodynamischen Größen wollen wir in unserer Beispielanwendung messen:
+
+\vspace{-2mm}
+\begin{align}
+\mathrm{Energie                      :}\quad & E=\left\langle H\right\rangle
+\ \mathrm{,}\label{equ:energie}\\[6mm]
+\mathrm{Magnetisierung\ pro\ Spin    :}\quad & M=\left\langle S_i\right\rangle
+\ \mathrm{,}\label{equ:magnetisierung}\\[4mm]
+\mathrm{Spezifische\ W"arme          :}\quad & C_V=\frac{1}{Nk\,T^2}\left(\left\langle H^2\right\rangle-\left\langle H\right\rangle^2\right)
+\ \mathrm{,}\label{equ:spezwaerme}\\[3mm]
+\mathrm{Magnetische\ Suszeptibilit"at:}\quad & \chi_m=\frac{N}{k\,T}\left(\left\langle S_i^2\right\rangle-\left\langle S_i\right\rangle^2\right)
+\ \mathrm{.}\label{equ:suszeptibilitaet}
+\end{align}
+
+\section{Implementierung}
+
+Hallo
+
+\section{Ergebnisse}
+
+
+
+relaxation time goes up for transition
+
+aussicht cluster alg
+
+finite size scaling critical exp
+
+Vergleich mit Meanfield

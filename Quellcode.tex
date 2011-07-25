@@ -1,0 +1,56 @@
+\chapter{Quellcode}
+
+\section{Hauptprogramm}
+
+\section{Modelle}
+
+\subsection{Abstraktes Modell}
+
+\begin{cppcode}[caption={Classes/Model/AbstractModel.cpp},label=code:AbstractModel]
+#ifndef CLASS_ABSTRACTMODEL
+#define CLASS_ABSTRACTMODEL
+
+class AbstractModel {
+
+  protected:
+  
+    int n;
+
+  public:
+
+    AbstractModel(int n_parameter) {
+
+      n = n_parameter;
+        
+    };
+
+    int getN() {
+    
+      return n;
+    
+    };
+
+    virtual int getNb() = 0;
+    virtual int getI1(int b) = 0;
+    virtual int getI2(int b) = 0;
+    
+};
+
+#endif
+\end{cppcode}
+
+\subsection{1D Modell mit offenen Randbedingungen}
+
+\subsection{1D Modell mit periodischen Randbedingungen}
+
+\subsection{2D Modell mit offenen Randbedingungen}
+
+\subsection{2D Modell mit periodischen Randbedingungen}
+
+\section{Algorithmen}
+
+\subsection{Abstrakter Algorithmus}
+
+\subsection{SSE}
+
+\subsection{ED}
