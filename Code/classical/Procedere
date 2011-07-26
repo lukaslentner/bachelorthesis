@@ -1,9 +1,0 @@
-Procedere:
-
- - Measure
-
- - Find Peaks in Susceptibility and put in gnuplot Script and Data file
- 
- - Find q, that the graphs meet in one point
- 
- - Put Tc and critical exp. in file
