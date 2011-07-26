@@ -1,3 +1,3 @@
 #!/bin/bash
 
-c++ Source/QHS.cpp -g -lgsl -lgslcblas -lm -fstack-protector-all -o QHS
+c++ Source/SIM.cpp -g -lgsl -lgslcblas -lm -fstack-protector-all -o SIM

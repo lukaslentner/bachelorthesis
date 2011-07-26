@@ -2,9 +2,12 @@
 #define CLASS_SSEALGORITHM
 
 #include <gsl/gsl_rng.h>
-#include <iostream>
 
 #include "AbstractAlgorithm.cpp"
+#include "../Analyzer/EAnalyzer.cpp"
+#include "../Analyzer/HAnalyzer.cpp"
+#include "../Analyzer/MAnalyzer.cpp"
+#include "../Analyzer/SAnalyzer.cpp"
 
 class SSEAlgorithm : public AbstractAlgorithm {
 
@@ -15,9 +18,6 @@ class SSEAlgorithm : public AbstractAlgorithm {
 
     bool *spins;
     long nr;
-    int energy_countBins;
-    int heat_countBins;
-    int suscept_countBins;
     long lMax;
     long l;
     int *s;
@@ -42,18 +42,18 @@ class SSEAlgorithm : public AbstractAlgorithm {
       
         if(s[p] == 0) { // No operator -> try to insert
 
-          b = gsl_rng_uniform_int(generator, model->getNb()) + 1;
+          b = gsl_rng_uniform_int(generator, lattice->getNb()) + 1;
 
-          if(spins[model->getI1(b)] == spins[model->getI2(b)]) continue; // if bond-neighbour spins are parallel -> go to next p
+          if(spins[lattice->getI1(b)] == spins[lattice->getI2(b)]) continue; // if bond-neighbour spins are parallel -> go to next p
           
-          if(gsl_rng_uniform(generator) < ((double) model->getNb()) / 2 / (l - nr) / t) {
+          if(gsl_rng_uniform(generator) < ((double) lattice->getNb()) / 2 / (l - nr) / t) {
             s[p] = 2 * b;
             nr++;
           }
 
         } else if(s[p] % 2 == 0) { // Diagonal operator -> try to remove
         
-          if(gsl_rng_uniform(generator) < (double) 2 * (l - nr + 1) * t / model->getNb()) {
+          if(gsl_rng_uniform(generator) < (double) 2 * (l - nr + 1) * t / lattice->getNb()) {
             s[p] = 0;
             nr--;
           }
@@ -62,8 +62,8 @@ class SSEAlgorithm : public AbstractAlgorithm {
         
           b = s[p] / 2;
           
-          spins[model->getI1(b)] = !spins[model->getI1(b)];
-          spins[model->getI2(b)] = !spins[model->getI2(b)];
+          spins[lattice->getI1(b)] = !spins[lattice->getI1(b)];
+          spins[lattice->getI2(b)] = !spins[lattice->getI2(b)];
         
         }
       
@@ -79,10 +79,10 @@ class SSEAlgorithm : public AbstractAlgorithm {
       int i1;
       int i2;
 
-      long *vFirst = new long[model->getN()];
-      for(int i = 0; i < model->getN(); i++) vFirst[i] = -1;
-      long *vLast = new long[model->getN()];
-      for(int i = 0; i < model->getN(); i++) vLast[i]  = -1;
+      long *vFirst = new long[lattice->getN()];
+      for(int i = 0; i < lattice->getN(); i++) vFirst[i] = -1;
+      long *vLast = new long[lattice->getN()];
+      for(int i = 0; i < lattice->getN(); i++) vLast[i]  = -1;
       
       for(long v = 0; v < 4 * l; v++) x[v] = -1;
       
@@ -92,8 +92,8 @@ class SSEAlgorithm : public AbstractAlgorithm {
         
         v0 = 4 * p;
         b = s[p] / 2;
-        i1 = model->getI1(b);
-        i2 = model->getI2(b);
+        i1 = lattice->getI1(b);
+        i2 = lattice->getI2(b);
         
         // Link the last 2-vertex on this spin to new 0-vertex
         if(vLast[i1] == -1) {
@@ -118,7 +118,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
       }
       
       // Link vertexes periodicly if they interacted with operators
-      for(int i = 0; i < model->getN(); i++) {
+      for(int i = 0; i < lattice->getN(); i++) {
       
         if(vFirst[i] != -1) {
           x[vFirst[i]] = vLast[i];
@@ -157,7 +157,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
       }
       
       // Adjust spins
-      for(int i = 0; i < model->getN(); i++) {
+      for(int i = 0; i < lattice->getN(); i++) {
       
         if(vFirst[i] == -1) {
           if(gsl_rng_uniform(generator) < 0.5) spins[i] = !spins[i];
@@ -176,7 +176,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
       int spinSum = 0;
     
-      for(int i = 0; i < model->getN(); i++) {
+      for(int i = 0; i < lattice->getN(); i++) {
         spinSum += spins[i] ? 0.5 : -0.5;
       }
       
@@ -184,119 +184,18 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
     };
     
-    int getEnergyRelaxationTime() {
-    
-      const int relaxationTimeTryTime = 50;
-      int relaxationTime;
-      
-      double sumOfNr = 0;
-      double sumOfNrSquared = 0;
-      double *nrWhileTrying = new double[relaxationTimeTryTime];
-    
-      for(int time = 0; time < relaxationTimeTryTime; time++) {
-      
-        nrWhileTrying[time] = nr;
-        doSweep();
-        
-        sumOfNr += nrWhileTrying[time];
-        sumOfNrSquared += pow(nrWhileTrying[time], 2);
-      
-      }
-      
-      double autoCorrelation;
-    
-      for(relaxationTime = 0; relaxationTime < relaxationTimeTryTime; relaxationTime++) {
-    
-        autoCorrelation = 0;
-      
-        for(int i = 0; i < relaxationTimeTryTime - relaxationTime; i++) {
-          autoCorrelation += nrWhileTrying[i] * nrWhileTrying[i + relaxationTime] * pow(t, 2);
-        }
-        autoCorrelation /= relaxationTimeTryTime - relaxationTime;
-        autoCorrelation = (autoCorrelation - pow(sumOfNr * t / relaxationTimeTryTime, 2)) / ((sumOfNrSquared * pow(t, 2) / relaxationTimeTryTime) - pow(sumOfNr * t / relaxationTimeTryTime, 2));
-        
-        if(isnan(autoCorrelation)) {
-          printf("# Temperatures underneeth %+20.13e were not measured, due to the unknown energy relaxation time\n", t);
-          throw "Unknown energy relaxation time";
-        };
-        
-        if(autoCorrelation < exp((double) -1)) {
-          delete nrWhileTrying;
-          return relaxationTime;
-        }
-    
-      }
-      
-      printf("# Temperatures underneeth %+20.13e were not measured, because the maximal energy relaxation time was exceeded\n", t);
-      throw "The maximal energy relaxation time was exceeded";
-    
-    };
-    
-    int getHeatRelaxationTime() {
-    
-      const int relaxationTimeTryTime = 50;
-      int relaxationTime;
-      
-      double *sumOfNrWhileTrying        = new double[relaxationTimeTryTime];
-      double *sumOfNrSquaredWhileTrying = new double[relaxationTimeTryTime];
-    
-      for(int time = 0; time < relaxationTimeTryTime; time++) {
-      
-        sumOfNrWhileTrying[time]        = (time == 0 ? 0 : sumOfNrWhileTrying[time - 1]) + nr;
-        sumOfNrSquaredWhileTrying[time] = (time == 0 ? 0 : sumOfNrSquaredWhileTrying[time - 1]) + pow(nr, 2);
-      
-        doSweep();
-      
-      }
-    
-      for(relaxationTime = 0; relaxationTime < relaxationTimeTryTime - 1; relaxationTime++) {
-        
-        double sumOfAAa = 0;
-        double sumOfA = 0;
-        double sumOfASquared = 0;
-        for(int i = 1; i < relaxationTimeTryTime - relaxationTime; i++) {
-          sumOfAAa      +=    ((sumOfNrSquaredWhileTrying[i] / i) - pow(sumOfNrWhileTrying[i] / i, 2) - (sumOfNrWhileTrying[i] / i)) * ((sumOfNrSquaredWhileTrying[i + relaxationTime] / (i + relaxationTime)) - pow(sumOfNrWhileTrying[i + relaxationTime] / (i + relaxationTime), 2) - (sumOfNrWhileTrying[i + relaxationTime] / (i + relaxationTime)));
-          sumOfA        +=     (sumOfNrSquaredWhileTrying[i] / i) - pow(sumOfNrWhileTrying[i] / i, 2) - (sumOfNrWhileTrying[i] / i);
-          sumOfASquared += pow((sumOfNrSquaredWhileTrying[i] / i) - pow(sumOfNrWhileTrying[i] / i, 2) - (sumOfNrWhileTrying[i] / i), 2);
-        }
-        double autoCorrelation = ((sumOfAAa / (relaxationTimeTryTime - relaxationTime - 1)) - pow(sumOfA / (relaxationTimeTryTime - relaxationTime - 1), 2)) / ((sumOfASquared / (relaxationTimeTryTime - relaxationTime - 1)) - pow(sumOfA / (relaxationTimeTryTime - relaxationTime - 1), 2));
-        
-        std::cerr << sumOfAAa << "$" << sumOfA << "$" << sumOfASquared << " = " << autoCorrelation << std::endl;
-        std::cerr << relaxationTimeTryTime - relaxationTime << std::endl;
-        
-        if(isnan(autoCorrelation)) {
-          printf("# Temperatures underneeth %+20.13e were not measured, due to the unknown heat relaxation time\n", t);
-          throw "Unknown heat relaxation time";
-        };
-        
-        if(autoCorrelation < exp((double) -1)) {
-          delete sumOfNrSquaredWhileTrying;
-          delete sumOfNrWhileTrying;
-          return relaxationTime;
-        }
-    
-      }
-      
-      printf("# Temperatures underneeth %+20.13e were not measured, because the maximal heat relaxation time was exceeded\n", t);
-      throw "The maximal heat relaxation time was exceeded";
-    
-    };
-    
   public:
     
-    SSEAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
+    SSEAlgorithm(AbstractLattice* lattice_parameter, int measureCount_parameter) : AbstractAlgorithm(lattice_parameter, measureCount_parameter) {
     
       gsl_rng_env_setup();
       generatorType = gsl_rng_default;
       generator = gsl_rng_alloc(generatorType);
       gsl_rng_set(generator, time(NULL));
 
-      spins = new bool[model->getN()];
-      for(int i = 0; i < model->getN(); i++) spins[i] = gsl_rng_uniform_int(generator, 2);
+      spins = new bool[lattice->getN()];
+      for(int i = 0; i < lattice->getN(); i++) spins[i] = gsl_rng_uniform_int(generator, 2);
       nr = 0;
-      energy_countBins  = 3000;
-      heat_countBins    = 10;
-      suscept_countBins = 3000;
       lMax = 10000000;
       l = 10;
       s = new int[lMax];
@@ -316,101 +215,45 @@ class SSEAlgorithm : public AbstractAlgorithm {
     };
     
     void runTemperatureRound() {
+    
+      for(long i = 0; i < runCount; i++) {
       
-      int energy_relaxationTime  = 3;//getEnergyRelaxationTime();
-      int heat_relaxationTime    = 3;//getHeatRelaxationTime();
-      int suscept_relaxationTime = 3;//getEnergyRelaxationTime();
-      
-      long energy_measurementsPerBin  = 40 * energy_relaxationTime;
-      long heat_measurementsPerBin    = 4000 * heat_relaxationTime;
-      long suscept_measurementsPerBin = 40 * suscept_relaxationTime;
-      
-      bool energy_finished  = false;
-      bool heat_finished    = false;
-      bool suscept_finished = false;
-      
-      double *energy_perBin  = new double[energy_countBins];
-      double *heat_perBin    = new double[heat_countBins];
-      double *suscept_perBin = new double[suscept_countBins];
-      
-      double energy_sumOfBin  = 0;
-      double heat_sumOfBin    = 0;
-      double suscept_sumOfBin = 0;
+        if(i > runCount - measureCount) {
+          energyMeasurements[i - runCount + measureCount] = -nr * t;
+          magMeasurements[i - runCount + measureCount]    = fabs(double(getSpinSum()) / lattice->getN());
+        }
+        
+        doSweep();
+        
+      }
 
-      for(int j = 0; j < 10000; j++) {
-        doSweep();
-      }
-      
-      double energy_sumOfNr              = 0;
-      double heat_sumOfNr                = 0;
-      double heat_sumOfNrSquared         = 0;
-      double suscept_sumOfSpinSumSquared = 0;
-      
-      for(unsigned long j = 0; j < long(1) << (sizeof(long) * 8 - 1); j++) {
-      
-        if(j % energy_measurementsPerBin == 0 && j != 0 && !energy_finished) {
-          int bin = j / energy_measurementsPerBin;
-          energy_perBin[bin] = -energy_sumOfNr / energy_measurementsPerBin * t;
-          energy_sumOfBin += energy_perBin[bin];
-          energy_sumOfNr = 0;
-          if(bin >= energy_countBins) energy_finished = true;
-        }
-      
-        if(j % heat_measurementsPerBin == 0 && j != 0 && !heat_finished) {
-          int bin = j / heat_measurementsPerBin;
-          heat_perBin[bin] = (heat_sumOfNrSquared / heat_measurementsPerBin) - pow(heat_sumOfNr / heat_measurementsPerBin, 2) - (heat_sumOfNr / heat_measurementsPerBin);
-          heat_sumOfBin += heat_perBin[bin];
-          heat_sumOfNr = 0;
-          heat_sumOfNrSquared = 0;
-          if(bin >= heat_countBins) heat_finished = true;
-        }
-      
-        if(j % suscept_measurementsPerBin == 0 && j != 0 && !suscept_finished) {
-          int bin = j / suscept_measurementsPerBin;
-          suscept_perBin[bin] = suscept_sumOfSpinSumSquared / suscept_measurementsPerBin / t / model->getN();
-          suscept_sumOfBin += suscept_perBin[bin];
-          suscept_sumOfSpinSumSquared = 0;
-          if(bin >= suscept_countBins) suscept_finished = true;
-        }
-      
-        energy_sumOfNr              += nr;
-        heat_sumOfNr                += nr;
-        heat_sumOfNrSquared         += pow(nr, 2);
-        suscept_sumOfSpinSumSquared += pow(getSpinSum(), 2);
-        
-        doSweep();
-        
-        if(energy_finished && heat_finished && suscept_finished) break;
-        
-      }
-      
-      avE = (energy_sumOfBin / energy_countBins) + ((double) model->getNb() / 4);
-      erE = 0;
-      for(long bin = 0; bin < energy_countBins; bin++) {
-        erE += pow(energy_perBin[bin] - avE, 2);
-      }
-      erE = sqrt(erE / energy_countBins / (energy_countBins - 1));
-      rtE = energy_relaxationTime;
-      
-      avH = (heat_sumOfBin / heat_countBins);
-      erH = 0;
-      for(long bin = 0; bin < heat_countBins; bin++) {
-        erH += pow(heat_perBin[bin]  - avH, 2);
-      }
-      erH = sqrt(erH / heat_countBins / (heat_countBins - 1));
-      rtH = heat_relaxationTime;
-      
-      avS = (suscept_sumOfBin / suscept_countBins);
-      erS = 0;
-      for(long bin = 0; bin < suscept_countBins; bin++) {
-        erS += pow(suscept_perBin[bin]  - avS, 2);
-      }
-      erS = sqrt(erS / suscept_countBins / (suscept_countBins - 1));
-      rtS = suscept_relaxationTime;
-      
-      delete suscept_perBin;
-      delete heat_perBin;
-      delete energy_perBin;
+      EAnalyzer *eAnalyzer = new EAnalyzer(this, lattice);
+      eAnalyzer->analyze();
+      avE = eAnalyzer->getAverage();
+      erE = eAnalyzer->getError();
+      rtE = eAnalyzer->getRelaxationTime();
+      delete eAnalyzer;
+
+      HAnalyzer *hAnalyzer = new HAnalyzer(this, lattice);
+      hAnalyzer->analyze();
+      avH = hAnalyzer->getAverage();
+      erH = hAnalyzer->getError();
+      rtH = hAnalyzer->getRelaxationTime();
+      delete hAnalyzer;
+
+      MAnalyzer *mAnalyzer = new MAnalyzer(this, lattice);
+      mAnalyzer->analyze();
+      avM = mAnalyzer->getAverage();
+      erM = mAnalyzer->getError();
+      rtM = mAnalyzer->getRelaxationTime();
+      delete mAnalyzer;
+
+      SAnalyzer *sAnalyzer = new SAnalyzer(this, lattice);
+      sAnalyzer->analyze();
+      avS = sAnalyzer->getAverage();
+      erS = sAnalyzer->getError();
+      rtS = sAnalyzer->getRelaxationTime();
+      delete sAnalyzer;
     
     };
 

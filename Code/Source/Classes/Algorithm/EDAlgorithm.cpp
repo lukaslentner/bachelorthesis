@@ -15,14 +15,14 @@ class EDAlgorithm : public AbstractAlgorithm {
 
     void hAction(TNT::Array2D<double> hg, int s, TNT::Array1D<int> mapS) {
 
-      for(int b = 1; b <= model->getNb(); b++) {
+      for(int b = 1; b <= lattice->getNb(); b++) {
 
-        bool i1Up = s & (int(1) << model->getI1(b));
-        bool i2Up = s & (int(1) << model->getI2(b));
+        bool i1Up = s & (int(1) << lattice->getI1(b));
+        bool i2Up = s & (int(1) << lattice->getI2(b));
         
         hg[mapS[s]][mapS[s]] += i1Up == i2Up ? 0.25 : -0.25;
         
-        if(i1Up != i2Up) hg[mapS[s]][mapS[s ^ (int(1) << model->getI1(b)) ^ (int(1) << model->getI2(b))]] += 0.5;
+        if(i1Up != i2Up) hg[mapS[s]][mapS[s ^ (int(1) << lattice->getI1(b)) ^ (int(1) << lattice->getI2(b))]] += 0.5;
       
       }
       
@@ -42,13 +42,13 @@ class EDAlgorithm : public AbstractAlgorithm {
 
   public:
     
-    EDAlgorithm(AbstractModel* model_parameter) : AbstractAlgorithm(model_parameter) {
+    EDAlgorithm(AbstractLattice* lattice_parameter, int measureCount_parameter) : AbstractAlgorithm(lattice_parameter, measureCount_parameter) {
     
-      twoPowN = int(1) << model->getN();
+      twoPowN = int(1) << lattice->getN();
       
-      TNT::Array2D<int> mapSIndex(model->getN() + 1, twoPowN, 0); // 2nd dimension needs to be minimum "choose n/2 from n", but I was lazy ...
+      TNT::Array2D<int> mapSIndex(lattice->getN() + 1, twoPowN, 0); // 2nd dimension needs to be minimum "choose n/2 from n", but I was lazy ...
       TNT::Array1D<int> mapS(twoPowN, 0);
-      TNT::Array1D<int> sIndexLength(model->getN() + 1, 0);
+      TNT::Array1D<int> sIndexLength(lattice->getN() + 1, 0);
       
       e = new TNT::Array1D<double>(twoPowN, 0.0);
       int eIndex = 0;
@@ -60,7 +60,7 @@ class EDAlgorithm : public AbstractAlgorithm {
         sIndexLength[g]++;
       }
       
-      for(int g = 0; g <= model->getN() / 2; g++) {
+      for(int g = 0; g <= lattice->getN() / 2; g++) {
       
         TNT::Array2D<double> hg(sIndexLength[g], sIndexLength[g], 0.0);
         TNT::Array1D<double> eg(sIndexLength[g], 0.0);
@@ -69,7 +69,7 @@ class EDAlgorithm : public AbstractAlgorithm {
           hAction(hg, mapSIndex[g][sIndex], mapS);
         }
         
-        std::cerr << "Diagonalize matrix " << (g + 1) << " von " << ((model->getN() / 2) + 1) << " [" << sIndexLength[g] << "²]" << std::endl;
+        std::cerr << "Diagonalize matrix " << (g + 1) << " von " << ((lattice->getN() / 2) + 1) << " [" << sIndexLength[g] << "²]" << std::endl;
         
         JAMA::Eigenvalue<double> eFactory(hg);
         eFactory.getRealEigenvalues(eg);
@@ -78,7 +78,7 @@ class EDAlgorithm : public AbstractAlgorithm {
         
           (*e)[eIndex] = eg[sIndex];
           eIndex++;
-          if(model->getN() % 2 != 0 || g != model->getN() / 2) {
+          if(lattice->getN() % 2 != 0 || g != lattice->getN() / 2) {
             (*e)[eIndex] = eg[sIndex];
             eIndex++;
           }
@@ -109,7 +109,7 @@ class EDAlgorithm : public AbstractAlgorithm {
 
       avE = sumOfE / z;
       avH = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
-      //avS = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / t / model->getN();
+      //avS = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / t / lattice->getN();
       
     };
     
