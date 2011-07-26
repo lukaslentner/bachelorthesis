@@ -1,56 +1,63 @@
 \chapter{Quellcode}
 
-\section{Hauptprogramm}
+\section{Hauptprogramm SIM}
 
-\section{Modelle}
+\cppcodefile[label=code:SIM]{SIM.cpp}
 
-\subsection{Abstraktes Modell}
+\section{Gitter Klassen}
 
-\begin{cppcode}[caption={Classes/Model/AbstractModel.cpp},label=code:AbstractModel]
-#ifndef CLASS_ABSTRACTMODEL
-#define CLASS_ABSTRACTMODEL
+\subsection{Abstrakte Gitter}
 
-class AbstractModel {
+\cppcodefile[label=code:AbstractLattice]{Classes/Lattice/AbstractLattice.cpp}
 
-  protected:
-  
-    int n;
+\subsection{1D Gitter mit offenen Randbedingungen}
 
-  public:
+\cppcodefile[label=code:Open1DLattice]{Classes/Lattice/Open1DLattice.cpp}
 
-    AbstractModel(int n_parameter) {
+\subsection{1D Gitter mit periodischen Randbedingungen}
 
-      n = n_parameter;
-        
-    };
+\cppcodefile[label=code:Periodic1DLattice]{Classes/Lattice/Periodic1DLattice.cpp}
 
-    int getN() {
-    
-      return n;
-    
-    };
+\subsection{2D Gitter mit periodischen Randbedingungen}
 
-    virtual int getNb() = 0;
-    virtual int getI1(int b) = 0;
-    virtual int getI2(int b) = 0;
-    
-};
+\cppcodefile[label=code:Periodic2DLattice]{Classes/Lattice/Periodic2DLattice.cpp}
 
-#endif
-\end{cppcode}
-
-\subsection{1D Modell mit offenen Randbedingungen}
-
-\subsection{1D Modell mit periodischen Randbedingungen}
-
-\subsection{2D Modell mit offenen Randbedingungen}
-
-\subsection{2D Modell mit periodischen Randbedingungen}
-
-\section{Algorithmen}
+\section{Algorithmus Klassen}
 
 \subsection{Abstrakter Algorithmus}
 
-\subsection{SSE}
+\cppcodefile[label=code:AbstractAlgorithm]{Classes/Algorithm/AbstractAlgorithm.cpp}
 
 \subsection{ED}
+
+\cppcodefile[label=code:EDAlgorithm]{Classes/Algorithm/EDAlgorithm.cpp}
+
+\subsection{ISING}
+
+\cppcodefile[label=code:ISINGAlgorithm]{Classes/Algorithm/ISINGAlgorithm.cpp}
+
+\subsection{SSE}
+
+\cppcodefile[label=code:SSEAlgorithm]{Classes/Algorithm/SSEAlgorithm.cpp}
+
+\section{Analysemodule}
+
+\subsection{Abstraktes Analysemodul}
+
+\cppcodefile[label=code:AbstractAnalyzer]{Classes/Analyzer/AbstractAnalyzer.cpp}
+
+\subsection{Analysemodul für die Energie}
+
+\cppcodefile[label=code:EAnalyzer]{Classes/Analyzer/EAnalyzer.cpp}
+
+\subsection{Analysemodul für die Spezifische Wärme}
+
+\cppcodefile[label=code:HAnalyzer]{Classes/Analyzer/HAnalyzer.cpp}
+
+\subsection{Analysemodul für die Magnetisierung pro Spin}
+
+\cppcodefile[label=code:MAnalyzer]{Classes/Analyzer/MAnalyzer.cpp}
+
+\subsection{Analysemodul für die Magnetische Suszeptibilität}
+
+\cppcodefile[label=code:SAnalyzer]{Classes/Analyzer/SAnalyzer.cpp}

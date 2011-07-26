@@ -18,18 +18,24 @@
 \contentsline {chapter}{\numberline {4}Quantenmechanische MCS mit Hilfe der Stochastic Series Expansion}{17}{chapter.4}
 \contentsline {chapter}{\numberline {5}Zusammenfassung}{19}{chapter.5}
 \contentsline {chapter}{\numberline {A}Quellcode}{21}{appendix.A}
-\contentsline {section}{\numberline {A.1}Hauptprogramm}{21}{section.A.1}
-\contentsline {section}{\numberline {A.2}Modelle}{21}{section.A.2}
-\contentsline {subsection}{\numberline {A.2.1}Abstraktes Modell}{21}{subsection.A.2.1}
-\contentsline {subsection}{\numberline {A.2.2}1D Modell mit offenen Randbedingungen}{22}{subsection.A.2.2}
-\contentsline {subsection}{\numberline {A.2.3}1D Modell mit periodischen Randbedingungen}{22}{subsection.A.2.3}
-\contentsline {subsection}{\numberline {A.2.4}2D Modell mit offenen Randbedingungen}{22}{subsection.A.2.4}
-\contentsline {subsection}{\numberline {A.2.5}2D Modell mit periodischen Randbedingungen}{22}{subsection.A.2.5}
-\contentsline {section}{\numberline {A.3}Algorithmen}{22}{section.A.3}
-\contentsline {subsection}{\numberline {A.3.1}Abstrakter Algorithmus}{22}{subsection.A.3.1}
-\contentsline {subsection}{\numberline {A.3.2}SSE}{22}{subsection.A.3.2}
-\contentsline {subsection}{\numberline {A.3.3}ED}{22}{subsection.A.3.3}
-\contentsline {chapter}{Abbildungsverzeichnis}{23}{appendix*.3}
-\contentsline {chapter}{Tabellenverzeichnis}{25}{appendix*.4}
-\contentsline {chapter}{Quellcodeverzeichnis}{27}{appendix*.5}
-\contentsline {chapter}{Literaturverzeichnis}{29}{appendix*.6}
+\contentsline {section}{\numberline {A.1}Hauptprogramm SIM}{21}{section.A.1}
+\contentsline {section}{\numberline {A.2}Gitter Klassen}{24}{section.A.2}
+\contentsline {subsection}{\numberline {A.2.1}Abstrakte Gitter}{24}{subsection.A.2.1}
+\contentsline {subsection}{\numberline {A.2.2}1D Gitter mit offenen Randbedingungen}{24}{subsection.A.2.2}
+\contentsline {subsection}{\numberline {A.2.3}1D Gitter mit periodischen Randbedingungen}{25}{subsection.A.2.3}
+\contentsline {subsection}{\numberline {A.2.4}2D Gitter mit periodischen Randbedingungen}{26}{subsection.A.2.4}
+\contentsline {section}{\numberline {A.3}Algorithmus Klassen}{27}{section.A.3}
+\contentsline {subsection}{\numberline {A.3.1}Abstrakter Algorithmus}{27}{subsection.A.3.1}
+\contentsline {subsection}{\numberline {A.3.2}ED}{31}{subsection.A.3.2}
+\contentsline {subsection}{\numberline {A.3.3}ISING}{33}{subsection.A.3.3}
+\contentsline {subsection}{\numberline {A.3.4}SSE}{36}{subsection.A.3.4}
+\contentsline {section}{\numberline {A.4}Analysemodule}{40}{section.A.4}
+\contentsline {subsection}{\numberline {A.4.1}Abstraktes Analysemodul}{40}{subsection.A.4.1}
+\contentsline {subsection}{\numberline {A.4.2}Analysemodul f\"ur die Energie}{42}{subsection.A.4.2}
+\contentsline {subsection}{\numberline {A.4.3}Analysemodul f\"ur die Spezifische W\"arme}{43}{subsection.A.4.3}
+\contentsline {subsection}{\numberline {A.4.4}Analysemodul f\"ur die Magnetisierung pro Spin}{43}{subsection.A.4.4}
+\contentsline {subsection}{\numberline {A.4.5}Analysemodul f\"ur die Magnetische Suszeptibilit\"at}{44}{subsection.A.4.5}
+\contentsline {chapter}{Abbildungsverzeichnis}{45}{appendix*.3}
+\contentsline {chapter}{Tabellenverzeichnis}{47}{appendix*.4}
+\contentsline {chapter}{Quellcodeverzeichnis}{49}{appendix*.5}
+\contentsline {chapter}{Literaturverzeichnis}{51}{appendix*.6}
