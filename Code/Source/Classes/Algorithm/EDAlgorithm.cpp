@@ -69,7 +69,7 @@ class EDAlgorithm : public AbstractAlgorithm {
           hAction(hg, mapSIndex[g][sIndex], mapS);
         }
         
-        std::cerr << "Diagonalize matrix " << (g + 1) << " von " << ((lattice->getN() / 2) + 1) << " [" << sIndexLength[g] << "²]" << std::endl;
+        std::cerr << "Diagonalize matrix " << (g + 1) << " von " << ((lattice->getN() / 2) + 1) << " [" << sIndexLength[g] << "^2]" << std::endl;
         
         JAMA::Eigenvalue<double> eFactory(hg);
         eFactory.getRealEigenvalues(eg);

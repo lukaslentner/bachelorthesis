@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    if(argc != 8) throw "[SIM] Error: Please specify 7 parameters (Size, Lattice-Index, Measure-Count, Algorithm-Index, Start-Temperature, End-Temperature, Temperature-Step)\n              - Size can be any positive integer\n              - Lattice-Index:\n                 0: Open-1D\n                 1: Periodic-1D\n                 2: Periodic-2D\n              - Measure-Count should be a positive long integer - ED of course needs no Measure-Count (=0)\n              - Algorithm-Index:\n                 0: SSE - Stochastic Series Expansion\n                 1: ED  - Exact Diagonalization\n                 2: ISING  - Classical Ising simulation\n              - Temperatures should be positive floats (use the dot as delimiter)";
+    if(argc != 8) throw "[SIM] Error: Please specify 7 parameters (Size, Lattice-Index, Measure-Count, Algorithm-Index, Start-Temperature, End-Temperature, Temperature-Step)\n              - Size can be any positive integer\n              - Lattice-Index:\n                 0: Open-1D\n                 1: Periodic-1D\n                 2: Periodic-2D\n              - Measure-Count should be a positive long integer - ED of course needs no Measure-Count (=0)\n              - Algorithm-Index:\n                 0: ED  - Exact Diagonalization\n                 1: ISING  - Classical Ising simulation\n                 2: SSE - Stochastic Series Expansion\n              - Temperatures should be positive floats (use the dot as delimiter)";
 
     int size                = atoi(argv[1]);
     int latticeIndex        = atoi(argv[2]);
@@ -58,18 +58,18 @@ int main(int argc, char *argv[]) {
     switch(algorithmIndex) {
     
       case 0:
-        algorithm = new SSEAlgorithm(lattice, measureCount);
-        algorithmLabel = "SSE";
-        break;
-    
-      case 1:
         algorithm = new EDAlgorithm(lattice, measureCount);
         algorithmLabel = "ED";
         break;
     
-      case 2:
+      case 1:
         algorithm = new ISINGAlgorithm(lattice, measureCount);
         algorithmLabel = "ISING";
+        break;
+    
+      case 2:
+        algorithm = new SSEAlgorithm(lattice, measureCount);
+        algorithmLabel = "SSE";
         break;
     
       default:
