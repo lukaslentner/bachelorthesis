@@ -102,18 +102,17 @@ int main(int argc, char *argv[]) {
            "Algorithm-Index",
            "Temperature",
            "Average Energy",
-           "StdDv Of Energy",
-           "RelTi Of Energy",
+           "Error Of Energy",
+           "ACorTime Of Energy",
            "Average Heat",
-           "StdDv Of Heat",
-           "RelTi Of Heat",
+           "Error Of Heat",
+           "ACorTime Of Heat",
            "Average Mag",
-           "StdDv Of Mag",
-           "RelTi Of Mag",
+           "Error Of Mag",
+           "ACorTime Of Mag",
            "Average Suscept",
-           "StdDv Of Suscept",
-           "RelTi Of Suscept");
-    printf("# ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+           "Error Of Suscept",
+           "ACorTime Of Suscept");
 
     for(double temperature = endTemperature; temperature > startTemperature + (temperatureStep / 2); temperature -= temperatureStep) {
     
@@ -128,16 +127,16 @@ int main(int argc, char *argv[]) {
              temperature,
              algorithm->getAverageEnergy(),
              algorithm->getErrorOfEnergy(),
-             algorithm->getRelTiOfEnergy(),
-             algorithm->getAverageHeat(),
-             algorithm->getErrorOfHeat(),
-             algorithm->getRelTiOfHeat(),
-             algorithm->getAverageMag(),
-             algorithm->getErrorOfMag(),
-             algorithm->getRelTiOfMag(),
-             algorithm->getAverageSuscept(),
-             algorithm->getErrorOfSuscept(),
-             algorithm->getRelTiOfSuscept());
+             algorithm->getAutoCorrelationTimeOfEnergy(),
+             algorithm->getAverageHeatCapacity(),
+             algorithm->getErrorOfHeatCapacity(),
+             algorithm->getAutoCorrelationTimeOfHeatCapacity(),
+             algorithm->getAverageMagnetization(),
+             algorithm->getErrorOfMagnetization(),
+             algorithm->getAutoCorrelationTimeOfMagnetization(),
+             algorithm->getAverageSusceptibility(),
+             algorithm->getErrorOfSusceptibility(),
+             algorithm->getAutoCorrelationTimeOfSusceptibility());
       
       std::cerr << "[SIM] Info: Finished, Size=" << size << ", Lattice=" << latticeLabel << ", Measure-Count=" << measureCount << ", Algorithm=" << algorithmLabel << ", Temperature=" << temperature << std::endl;
 

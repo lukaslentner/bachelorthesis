@@ -13,7 +13,7 @@ class HAnalyzer : public AbstractAnalyzer {
     
     const char* getQuantityName() {
     
-      return "Specific Heat";
+      return "Heat Capacity";
     
     };
     

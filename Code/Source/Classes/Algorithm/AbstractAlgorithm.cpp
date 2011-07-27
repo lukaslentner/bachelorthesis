@@ -18,16 +18,16 @@ class AbstractAlgorithm {
     double t;
     double avE;
     double erE;
-    long rtE;
+    long atE;
     double avH;
     double erH;
-    long rtH;
+    long atH;
     double avM;
     double erM;
-    long rtM;
+    long atM;
     double avS;
     double erS;
-    long rtS;
+    long atS;
 
   public:
   
@@ -44,19 +44,19 @@ class AbstractAlgorithm {
       
       avE = 0;
       erE = 0;
-      rtE = 0;
+      atE = 0;
       
       avH = 0;
       erH = 0;
-      rtH = 0;
+      atH = 0;
       
       avM = 0;
       erM = 0;
-      rtM = 0;
+      atM = 0;
       
       avS = 0;
       erS = 0;
-      rtS = 0;
+      atS = 0;
     
     };
     
@@ -87,19 +87,19 @@ class AbstractAlgorithm {
       
       avE = 0;
       erE = 0;
-      rtE = 0;
+      atE = 0;
       
       avH = 0;
       erH = 0;
-      rtH = 0;
+      atH = 0;
       
       avM = 0;
       erM = 0;
-      rtM = 0;
+      atM = 0;
       
       avS = 0;
       erS = 0;
-      rtS = 0;
+      atS = 0;
     
     };
     
@@ -133,63 +133,63 @@ class AbstractAlgorithm {
     
     };
     
-    long getRelTiOfEnergy() {
+    long getAutoCorrelationTimeOfEnergy() {
     
-      return rtE;
+      return atE;
     
     };
     
-    double getAverageHeat() {
+    double getAverageHeatCapacity() {
     
       return avH;
     
     };
     
-    double getErrorOfHeat() {
+    double getErrorOfHeatCapacity() {
     
       return erH;
     
     };
     
-    long getRelTiOfHeat() {
+    long getAutoCorrelationTimeOfHeatCapacity() {
     
-      return rtH;
+      return atH;
     
     };
     
-    double getAverageMag() {
+    double getAverageMagnetization() {
     
       return avM;
     
     };
     
-    double getErrorOfMag() {
+    double getErrorOfMagnetization() {
     
       return erM;
     
     };
     
-    long getRelTiOfMag() {
+    long getAutoCorrelationTimeOfMagnetization() {
     
-      return rtM;
+      return atM;
     
     };
     
-    double getAverageSuscept() {
+    double getAverageSusceptibility() {
     
       return avS;
     
     };
     
-    double getErrorOfSuscept() {
+    double getErrorOfSusceptibility() {
     
       return erS;
     
     };
     
-    long getRelTiOfSuscept() {
+    long getAutoCorrelationTimeOfSusceptibility() {
     
-      return rtS;
+      return atS;
     
     };
     

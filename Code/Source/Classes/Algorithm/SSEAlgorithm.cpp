@@ -231,28 +231,28 @@ class SSEAlgorithm : public AbstractAlgorithm {
       eAnalyzer->analyze();
       avE = eAnalyzer->getAverage();
       erE = eAnalyzer->getError();
-      rtE = eAnalyzer->getRelaxationTime();
+      atE = eAnalyzer->getAutoCorrelationTime();
       delete eAnalyzer;
 
       HAnalyzer *hAnalyzer = new HAnalyzer(this, lattice);
       hAnalyzer->analyze();
       avH = hAnalyzer->getAverage();
       erH = hAnalyzer->getError();
-      rtH = hAnalyzer->getRelaxationTime();
+      atH = hAnalyzer->getAutoCorrelationTime();
       delete hAnalyzer;
 
       MAnalyzer *mAnalyzer = new MAnalyzer(this, lattice);
       mAnalyzer->analyze();
       avM = mAnalyzer->getAverage();
       erM = mAnalyzer->getError();
-      rtM = mAnalyzer->getRelaxationTime();
+      atM = mAnalyzer->getAutoCorrelationTime();
       delete mAnalyzer;
 
       SAnalyzer *sAnalyzer = new SAnalyzer(this, lattice);
       sAnalyzer->analyze();
       avS = sAnalyzer->getAverage();
       erS = sAnalyzer->getError();
-      rtS = sAnalyzer->getRelaxationTime();
+      atS = sAnalyzer->getAutoCorrelationTime();
       delete sAnalyzer;
     
     };

@@ -19,7 +19,7 @@ class SAnalyzer : public AbstractAnalyzer {
     
     double getQuantity(long time) {
     
-      return (pow(algorithm->getMagMeasurement(time), 2) - pow(algorithm->getAverageMag(), 2)) * lattice->getN() / algorithm->getTemperature();
+      return (pow(algorithm->getMagMeasurement(time), 2) - pow(algorithm->getAverageMagnetization(), 2)) * lattice->getN() / algorithm->getTemperature();
     
     };
   

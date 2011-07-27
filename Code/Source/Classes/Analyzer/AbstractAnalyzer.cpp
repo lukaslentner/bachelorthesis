@@ -10,7 +10,7 @@ class AbstractAnalyzer {
     
     double average;
     double error;
-    long relaxationTime;
+    long autoCorrelationTime;
   
   public:
   
@@ -21,7 +21,7 @@ class AbstractAnalyzer {
       
       average = 0;
       error = 0;
-      relaxationTime = 0;
+      autoCorrelationTime = 0;
       
     };
 
@@ -40,20 +40,20 @@ class AbstractAnalyzer {
         sumSquared[time] = (time == 0 ? 0 : sumSquared[time - 1]) + pow(getQuantity(time), 2);
       }
       
-      for(relaxationTime = 0; relaxationTime < algorithm->getMeasureCount(); relaxationTime++) {
+      for(autoCorrelationTime = 0; autoCorrelationTime < algorithm->getMeasureCount(); autoCorrelationTime++) {
       
         double sumP = 0;
         
-        for(long time = 0; time < algorithm->getMeasureCount() - relaxationTime; time++) {
-          sumP += getQuantity(time) * getQuantity(time + relaxationTime);
+        for(long time = 0; time < algorithm->getMeasureCount() - autoCorrelationTime; time++) {
+          sumP += getQuantity(time) * getQuantity(time + autoCorrelationTime);
         }
         
-        long timeToAverage = algorithm->getMeasureCount() - relaxationTime;
+        long timeToAverage = algorithm->getMeasureCount() - autoCorrelationTime;
         double autoCorrelation = ((sumP / timeToAverage) - pow(sum[algorithm->getMeasureCount() - 1] / timeToAverage, 2)) / ((sumSquared[algorithm->getMeasureCount() - 1] / timeToAverage) - pow(sum[algorithm->getMeasureCount() - 1] / timeToAverage, 2));
       
         if(isnan(autoCorrelation)) {
           printf("# %s at temperature=%+20.13e was not measured, due to the unknown relaxation time\n", getQuantityName(), algorithm->getTemperature());
-          relaxationTime = -1;
+          autoCorrelationTime = -1;
           break;
         }
         
@@ -63,15 +63,15 @@ class AbstractAnalyzer {
     
       }
       
-      relaxationTime++;
+      autoCorrelationTime++;
       
-      if(relaxationTime != 0) {
+      if(autoCorrelationTime != 0) {
       
-        long binsCount = algorithm->getMeasureCount() / 3 / relaxationTime;
+        long binsCount = algorithm->getMeasureCount() / 3 / autoCorrelationTime;
         double *binAverage = new double[binsCount];
 
         for(long bin = 0; bin < binsCount; bin++) {
-          binAverage[bin] = (sum[(bin + 1) * 3 * relaxationTime] - sum[bin * 3 * relaxationTime]) / 3 / relaxationTime;
+          binAverage[bin] = (sum[(bin + 1) * 3 * autoCorrelationTime] - sum[bin * 3 * autoCorrelationTime]) / 3 / autoCorrelationTime;
           average += binAverage[bin] / binsCount;
         }
         
@@ -102,9 +102,9 @@ class AbstractAnalyzer {
     
     };
 
-    long getRelaxationTime() {
+    long getAutoCorrelationTime() {
     
-      return relaxationTime;
+      return autoCorrelationTime;
     
     };
   
