@@ -87,15 +87,15 @@ int main(int argc, char *argv[]) {
     printf("#\n");
     printf("# ----------------------------------------\n");
     printf("#\n");
-    printf("# Size                 = %+19.19i\n", size);
+    printf("# Size                 = %+29.29i\n", size);
     printf("# Lattice              = %s\n", latticeLabel);
-    printf("# Measure-Count        = %+19.19li\n", measureCount);
+    printf("# Measure-Count        = %+29.29li\n", measureCount);
     printf("# Algorithm            = %s\n", algorithmLabel);
-    printf("# Start-Temperature    = %+20.13e\n", startTemperature);
-    printf("# End-Temperature      = %+20.13e\n", endTemperature);
-    printf("# Temperature-Step     = %+20.13e\n", temperatureStep);
+    printf("# Start-Temperature    = %+30.23e\n", startTemperature);
+    printf("# End-Temperature      = %+30.23e\n", endTemperature);
+    printf("# Temperature-Step     = %+30.23e\n", temperatureStep);
     printf("#\n");
-    printf("# %-17s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s\n",
+    printf("# %-27s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s | %-28s\n",
            "Size",
            "Lattice-Index",
            "Measure-Count",
@@ -104,22 +104,27 @@ int main(int argc, char *argv[]) {
            "Average Energy",
            "Error Of Energy",
            "ACorTime Of Energy",
-           "Average Heat",
-           "Error Of Heat",
-           "ACorTime Of Heat",
-           "Average Mag",
-           "Error Of Mag",
-           "ACorTime Of Mag",
-           "Average Suscept",
-           "Error Of Suscept",
-           "ACorTime Of Suscept");
+           "Average Specific Heat",
+           "Error Of Specific Heat",
+           "ACorTime Of Specific Heat",
+           "Average Magnetisation",
+           "Error Of Magnetisation",
+           "ACorTime Of Magnetisation",
+           "Average Susceptibility",
+           "Error Of Susceptibility",
+           "ACorTime Of Susceptibility",
+           "Average A Magnetisation",
+           "Error Of A Magnetisation",
+           "ACorTime Of A Magnetisation",
+           "Average A Susceptibility",
+           "Error Of A Susceptibility",
+           "ACorTime Of A Susceptibility");
 
     for(double temperature = endTemperature; temperature > startTemperature + (temperatureStep / 2); temperature -= temperatureStep) {
     
-      algorithm->setTemperature(temperature);
-      algorithm->runTemperatureRound();
+      algorithm->runTemperatureRound(temperature);
       
-      printf("%+19.19i|%+19.19i|%+19.19li|%+19.19i|%+20.13e|%+20.13e|%+20.13e|%+19.19li|%+20.13e|%+20.13e|%+19.19li|%+20.13e|%+20.13e|%+19.19li|%+20.13e|%+20.13e|%+19.19li\n",
+      printf("%+29.29i|%+29.29i|%+29.29li|%+29.29i|%+30.23e|%+30.23e|%+30.23e|%+29.29li|%+30.23e|%+30.23e|%+29.29li|%+30.23e|%+30.23e|%+29.29li|%+30.23e|%+30.23e|%+29.29li|%+30.23e|%+30.23e|%+29.29li|%+30.23e|%+30.23e|%+29.29li\n",
              size,
              latticeIndex,
              measureCount,
@@ -128,15 +133,21 @@ int main(int argc, char *argv[]) {
              algorithm->getAverageEnergy(),
              algorithm->getErrorOfEnergy(),
              algorithm->getAutoCorrelationTimeOfEnergy(),
-             algorithm->getAverageHeatCapacity(),
-             algorithm->getErrorOfHeatCapacity(),
-             algorithm->getAutoCorrelationTimeOfHeatCapacity(),
-             algorithm->getAverageMagnetization(),
-             algorithm->getErrorOfMagnetization(),
-             algorithm->getAutoCorrelationTimeOfMagnetization(),
+             algorithm->getAverageSpecificHeat(),
+             algorithm->getErrorOfSpecificHeat(),
+             algorithm->getAutoCorrelationTimeOfSpecificHeat(),
+             algorithm->getAverageMagnetisation(),
+             algorithm->getErrorOfMagnetisation(),
+             algorithm->getAutoCorrelationTimeOfMagnetisation(),
              algorithm->getAverageSusceptibility(),
              algorithm->getErrorOfSusceptibility(),
-             algorithm->getAutoCorrelationTimeOfSusceptibility());
+             algorithm->getAutoCorrelationTimeOfSusceptibility(),
+             algorithm->getAverageAbsoluteMagnetisation(),
+             algorithm->getErrorOfAbsoluteMagnetisation(),
+             algorithm->getAutoCorrelationTimeOfAbsoluteMagnetisation(),
+             algorithm->getAverageAbsoluteSusceptibility(),
+             algorithm->getErrorOfAbsoluteSusceptibility(),
+             algorithm->getAutoCorrelationTimeOfAbsoluteSusceptibility());
       
       std::cerr << "[SIM] Info: Finished, Size=" << size << ", Lattice=" << latticeLabel << ", Measure-Count=" << measureCount << ", Algorithm=" << algorithmLabel << ", Temperature=" << temperature << std::endl;
 

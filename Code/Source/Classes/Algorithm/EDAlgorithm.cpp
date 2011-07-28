@@ -107,8 +107,8 @@ class EDAlgorithm : public AbstractAlgorithm {
         z += weight;
       }
 
-      avE = sumOfE / z;
-      avH = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
+      //avE = sumOfE / z;
+      //avH = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
       //avS = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / t / lattice->getN();
       
     };

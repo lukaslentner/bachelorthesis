@@ -4,10 +4,10 @@
 #include <gsl/gsl_rng.h>
 
 #include "AbstractAlgorithm.cpp"
-#include "../Analyzer/EAnalyzer.cpp"
+/*#include "../Analyzer/EAnalyzer.cpp"
 #include "../Analyzer/HAnalyzer.cpp"
 #include "../Analyzer/MAnalyzer.cpp"
-#include "../Analyzer/SAnalyzer.cpp"
+#include "../Analyzer/SAnalyzer.cpp"*/
 
 class SSEAlgorithm : public AbstractAlgorithm {
 
@@ -214,20 +214,22 @@ class SSEAlgorithm : public AbstractAlgorithm {
 
     };
     
-    void runTemperatureRound() {
+    void runTemperatureRound(double t_parameter) {
+    
+      AbstractAlgorithm::runTemperatureRound(t_parameter);
     
       for(long i = 0; i < runCount; i++) {
       
         if(i > runCount - measureCount) {
-          energyMeasurements[i - runCount + measureCount] = -nr * t;
-          magMeasurements[i - runCount + measureCount]    = fabs(double(getSpinSum()) / lattice->getN());
+          //energyMeasurements[i - runCount + measureCount] = -nr * t;
+          //magMeasurements[i - runCount + measureCount]    = fabs(double(getSpinSum()) / lattice->getN());
         }
         
         doSweep();
         
       }
 
-      EAnalyzer *eAnalyzer = new EAnalyzer(this, lattice);
+/*      EAnalyzer *eAnalyzer = new EAnalyzer(this, lattice);
       eAnalyzer->analyze();
       avE = eAnalyzer->getAverage();
       erE = eAnalyzer->getError();
@@ -253,7 +255,7 @@ class SSEAlgorithm : public AbstractAlgorithm {
       avS = sAnalyzer->getAverage();
       erS = sAnalyzer->getError();
       atS = sAnalyzer->getAutoCorrelationTime();
-      delete sAnalyzer;
+      delete sAnalyzer;*/
     
     };
 

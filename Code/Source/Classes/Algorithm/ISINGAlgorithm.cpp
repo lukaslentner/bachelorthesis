@@ -4,10 +4,12 @@
 #include <gsl/gsl_rng.h>
 
 #include "AbstractAlgorithm.cpp"
-#include "../Analyzer/EAnalyzer.cpp"
-#include "../Analyzer/HAnalyzer.cpp"
-#include "../Analyzer/MAnalyzer.cpp"
-#include "../Analyzer/SAnalyzer.cpp"
+#include "../Analyzer/IsingEnergyAnalyzer.cpp"
+#include "../Analyzer/IsingSpecificHeatAnalyzer.cpp"
+#include "../Analyzer/IsingMagnetisationAnalyzer.cpp"
+#include "../Analyzer/IsingSusceptibilityAnalyzer.cpp"
+#include "../Analyzer/IsingAbsoluteMagnetisationAnalyzer.cpp"
+#include "../Analyzer/IsingAbsoluteSusceptibilityAnalyzer.cpp"
 
 class ISINGAlgorithm : public AbstractAlgorithm {
 
@@ -110,9 +112,9 @@ class ISINGAlgorithm : public AbstractAlgorithm {
     
     };
     
-    void setTemperature(double t_parameter) {
+    void runTemperatureRound(double t_parameter) {
     
-      AbstractAlgorithm::setTemperature(t_parameter);
+      AbstractAlgorithm::runTemperatureRound(t_parameter);
       
       if(start) {
         for(int i = 0; i < lattice->getN(); i++) {
@@ -124,48 +126,59 @@ class ISINGAlgorithm : public AbstractAlgorithm {
         start = false;
       }
     
-    };
-    
-    void runTemperatureRound() {
-    
       for(long i = 0; i < runCount; i++) {
       
         if(i > runCount - measureCount) {
-          energyMeasurements[i - runCount + measureCount] = energy;
-          magMeasurements[i - runCount + measureCount]    = fabs(double(spinSum) / lattice->getN());
+          energyMeasurements[i - runCount + measureCount]                   = energy / lattice->getN();
+          magnetisationMeasurements[i - runCount + measureCount]            = double(spinSum) / lattice->getN();
+          absoluteMagnetisationMeasurements[i - runCount + measureCount]    = fabs(double(spinSum) / lattice->getN());
         }
         
         doSweep();
         
       }
 
-      EAnalyzer *eAnalyzer = new EAnalyzer(this, lattice);
-      eAnalyzer->analyze();
-      avE = eAnalyzer->getAverage();
-      erE = eAnalyzer->getError();
-      atE = eAnalyzer->getAutoCorrelationTime();
-      delete eAnalyzer;
+      IsingEnergyAnalyzer *isingEnergyAnalyzer = new IsingEnergyAnalyzer(this, lattice);
+      isingEnergyAnalyzer->analyze();
+      averageEnergy = isingEnergyAnalyzer->getAverage();
+      errorOfEnergy = isingEnergyAnalyzer->getError();
+      autoCorrelationTimeOfEnergy = isingEnergyAnalyzer->getAutoCorrelationTime();
+      delete isingEnergyAnalyzer;
 
-      HAnalyzer *hAnalyzer = new HAnalyzer(this, lattice);
-      hAnalyzer->analyze();
-      avH = hAnalyzer->getAverage();
-      erH = hAnalyzer->getError();
-      atH = hAnalyzer->getAutoCorrelationTime();
-      delete hAnalyzer;
+      IsingSpecificHeatAnalyzer *isingSpecificHeatAnalyzer = new IsingSpecificHeatAnalyzer(this, lattice);
+      isingSpecificHeatAnalyzer->analyze();
+      averageSpecificHeat = isingSpecificHeatAnalyzer->getAverage();
+      errorOfSpecificHeat = isingSpecificHeatAnalyzer->getError();
+      autoCorrelationTimeOfSpecificHeat = isingSpecificHeatAnalyzer->getAutoCorrelationTime();
+      delete isingSpecificHeatAnalyzer;
 
-      MAnalyzer *mAnalyzer = new MAnalyzer(this, lattice);
-      mAnalyzer->analyze();
-      avM = mAnalyzer->getAverage();
-      erM = mAnalyzer->getError();
-      atM = mAnalyzer->getAutoCorrelationTime();
-      delete mAnalyzer;
+      IsingMagnetisationAnalyzer *isingMagnetisationAnalyzer = new IsingMagnetisationAnalyzer(this, lattice);
+      isingMagnetisationAnalyzer->analyze();
+      averageMagnetisation = isingMagnetisationAnalyzer->getAverage();
+      errorOfMagnetisation = isingMagnetisationAnalyzer->getError();
+      autoCorrelationTimeOfMagnetisation = isingMagnetisationAnalyzer->getAutoCorrelationTime();
+      delete isingMagnetisationAnalyzer;
 
-      SAnalyzer *sAnalyzer = new SAnalyzer(this, lattice);
-      sAnalyzer->analyze();
-      avS = sAnalyzer->getAverage();
-      erS = sAnalyzer->getError();
-      atS = sAnalyzer->getAutoCorrelationTime();
-      delete sAnalyzer;
+      IsingSusceptibilityAnalyzer *isingSusceptibilityAnalyzer = new IsingSusceptibilityAnalyzer(this, lattice);
+      isingSusceptibilityAnalyzer->analyze();
+      averageSusceptibility = isingSusceptibilityAnalyzer->getAverage();
+      errorOfSusceptibility = isingSusceptibilityAnalyzer->getError();
+      autoCorrelationTimeOfSusceptibility = isingSusceptibilityAnalyzer->getAutoCorrelationTime();
+      delete isingSusceptibilityAnalyzer;
+
+      IsingAbsoluteMagnetisationAnalyzer *isingAbsoluteMagnetisationAnalyzer = new IsingAbsoluteMagnetisationAnalyzer(this, lattice);
+      isingAbsoluteMagnetisationAnalyzer->analyze();
+      averageAbsoluteMagnetisation = isingAbsoluteMagnetisationAnalyzer->getAverage();
+      errorOfAbsoluteMagnetisation = isingAbsoluteMagnetisationAnalyzer->getError();
+      autoCorrelationTimeOfAbsoluteMagnetisation = isingAbsoluteMagnetisationAnalyzer->getAutoCorrelationTime();
+      delete isingAbsoluteMagnetisationAnalyzer;
+
+      IsingAbsoluteSusceptibilityAnalyzer *isingAbsoluteSusceptibilityAnalyzer = new IsingAbsoluteSusceptibilityAnalyzer(this, lattice);
+      isingAbsoluteSusceptibilityAnalyzer->analyze();
+      averageAbsoluteSusceptibility = isingAbsoluteSusceptibilityAnalyzer->getAverage();
+      errorOfAbsoluteSusceptibility = isingAbsoluteSusceptibilityAnalyzer->getError();
+      autoCorrelationTimeOfAbsoluteSusceptibility = isingAbsoluteSusceptibilityAnalyzer->getAutoCorrelationTime();
+      delete isingAbsoluteSusceptibilityAnalyzer;
       
     };
     

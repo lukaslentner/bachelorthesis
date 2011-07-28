@@ -13,21 +13,36 @@ class AbstractAlgorithm {
     AbstractLattice* lattice;
     long measureCount;
     long runCount;
+    
     double *energyMeasurements;
-    double *magMeasurements;
+    double *magnetisationMeasurements;
+    double *absoluteMagnetisationMeasurements;
+    
     double t;
-    double avE;
-    double erE;
-    long atE;
-    double avH;
-    double erH;
-    long atH;
-    double avM;
-    double erM;
-    long atM;
-    double avS;
-    double erS;
-    long atS;
+    
+    double averageEnergy;
+    double errorOfEnergy;
+    long autoCorrelationTimeOfEnergy;
+    
+    double averageSpecificHeat;
+    double errorOfSpecificHeat;
+    long autoCorrelationTimeOfSpecificHeat;
+    
+    double averageMagnetisation;
+    double errorOfMagnetisation;
+    long autoCorrelationTimeOfMagnetisation;
+    
+    double averageSusceptibility;
+    double errorOfSusceptibility;
+    long autoCorrelationTimeOfSusceptibility;
+    
+    double averageAbsoluteMagnetisation;
+    double errorOfAbsoluteMagnetisation;
+    long autoCorrelationTimeOfAbsoluteMagnetisation;
+    
+    double averageAbsoluteSusceptibility;
+    double errorOfAbsoluteSusceptibility;
+    long autoCorrelationTimeOfAbsoluteSusceptibility;
 
   public:
   
@@ -37,34 +52,18 @@ class AbstractAlgorithm {
       measureCount = measureCount_parameter;
       runCount = measureCount * 3 / 2;
       
-      energyMeasurements = new double[measureCount];
-      magMeasurements    = new double[measureCount];
-      
-      t = 0;
-      
-      avE = 0;
-      erE = 0;
-      atE = 0;
-      
-      avH = 0;
-      erH = 0;
-      atH = 0;
-      
-      avM = 0;
-      erM = 0;
-      atM = 0;
-      
-      avS = 0;
-      erS = 0;
-      atS = 0;
+      energyMeasurements                   = new double[measureCount];
+      magnetisationMeasurements            = new double[measureCount];
+      absoluteMagnetisationMeasurements    = new double[measureCount];
     
     };
     
     ~AbstractAlgorithm() {
     
-      delete[] magMeasurements;
+      delete[] absoluteMagnetisationMeasurements;
+      delete[] magnetisationMeasurements;
       delete[] energyMeasurements;
-    
+      
     };
     
     long getMeasureCount() {
@@ -78,28 +77,34 @@ class AbstractAlgorithm {
       return runCount;
     
     };
-
-    virtual void runTemperatureRound() = 0;
     
-    virtual void setTemperature(double t_parameter) {
+    virtual void runTemperatureRound(double t_parameter) {
     
       t = t_parameter;
       
-      avE = 0;
-      erE = 0;
-      atE = 0;
+      averageEnergy = 0;
+      errorOfEnergy = 0;
+      autoCorrelationTimeOfEnergy = 0;
       
-      avH = 0;
-      erH = 0;
-      atH = 0;
+      averageSpecificHeat = 0;
+      errorOfSpecificHeat = 0;
+      autoCorrelationTimeOfSpecificHeat = 0;
       
-      avM = 0;
-      erM = 0;
-      atM = 0;
+      averageMagnetisation = 0;
+      errorOfMagnetisation = 0;
+      autoCorrelationTimeOfMagnetisation = 0;
       
-      avS = 0;
-      erS = 0;
-      atS = 0;
+      averageSusceptibility = 0;
+      errorOfSusceptibility = 0;
+      autoCorrelationTimeOfSusceptibility = 0;
+      
+      averageAbsoluteMagnetisation = 0;
+      errorOfAbsoluteMagnetisation = 0;
+      autoCorrelationTimeOfAbsoluteMagnetisation = 0;
+      
+      averageAbsoluteSusceptibility = 0;
+      errorOfAbsoluteSusceptibility = 0;
+      autoCorrelationTimeOfAbsoluteSusceptibility = 0;
     
     };
     
@@ -115,81 +120,123 @@ class AbstractAlgorithm {
     
     };
     
-    double getMagMeasurement(long time) {
+    double getMagnetisationMeasurement(long time) {
     
-      return magMeasurements[time];
+      return magnetisationMeasurements[time];
+    
+    };
+    
+    double getAbsoluteMagnetisationMeasurement(long time) {
+    
+      return absoluteMagnetisationMeasurements[time];
     
     };
     
     double getAverageEnergy() {
     
-      return avE;
+      return averageEnergy;
     
     };
     
     double getErrorOfEnergy() {
     
-      return erE;
+      return errorOfEnergy;
     
     };
     
     long getAutoCorrelationTimeOfEnergy() {
     
-      return atE;
+      return autoCorrelationTimeOfEnergy;
     
     };
     
-    double getAverageHeatCapacity() {
+    double getAverageSpecificHeat() {
     
-      return avH;
-    
-    };
-    
-    double getErrorOfHeatCapacity() {
-    
-      return erH;
+      return averageSpecificHeat;
     
     };
     
-    long getAutoCorrelationTimeOfHeatCapacity() {
+    double getErrorOfSpecificHeat() {
     
-      return atH;
-    
-    };
-    
-    double getAverageMagnetization() {
-    
-      return avM;
+      return errorOfSpecificHeat;
     
     };
     
-    double getErrorOfMagnetization() {
+    long getAutoCorrelationTimeOfSpecificHeat() {
     
-      return erM;
+      return autoCorrelationTimeOfSpecificHeat;
     
     };
     
-    long getAutoCorrelationTimeOfMagnetization() {
+    double getAverageMagnetisation() {
     
-      return atM;
+      return averageMagnetisation;
+    
+    };
+    
+    double getErrorOfMagnetisation() {
+    
+      return errorOfMagnetisation;
+    
+    };
+    
+    long getAutoCorrelationTimeOfMagnetisation() {
+    
+      return autoCorrelationTimeOfMagnetisation;
     
     };
     
     double getAverageSusceptibility() {
     
-      return avS;
+      return averageSusceptibility;
     
     };
     
     double getErrorOfSusceptibility() {
     
-      return erS;
+      return errorOfSusceptibility;
     
     };
     
     long getAutoCorrelationTimeOfSusceptibility() {
     
-      return atS;
+      return autoCorrelationTimeOfSusceptibility;
+    
+    };
+    
+    double getAverageAbsoluteMagnetisation() {
+    
+      return averageAbsoluteMagnetisation;
+    
+    };
+    
+    double getErrorOfAbsoluteMagnetisation() {
+    
+      return errorOfAbsoluteMagnetisation;
+    
+    };
+    
+    long getAutoCorrelationTimeOfAbsoluteMagnetisation() {
+    
+      return autoCorrelationTimeOfAbsoluteMagnetisation;
+    
+    };
+    
+    double getAverageAbsoluteSusceptibility() {
+    
+      return averageAbsoluteSusceptibility;
+    
+    };
+    
+    double getErrorOfAbsoluteSusceptibility() {
+    
+      return errorOfAbsoluteSusceptibility;
+    
+    };
+    
+    long getAutoCorrelationTimeOfAbsoluteSusceptibility() {
+    
+      return autoCorrelationTimeOfAbsoluteSusceptibility;
     
     };
     
