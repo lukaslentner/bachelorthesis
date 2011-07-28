@@ -2,6 +2,7 @@ set terminal postscript eps enhanced color solid rounded
 set datafile separator "|"
 set autoscale
 set encoding iso_8859_15
+set size 0.7,0.7
 
 set xlabel "Temperatur T [J]"
 
