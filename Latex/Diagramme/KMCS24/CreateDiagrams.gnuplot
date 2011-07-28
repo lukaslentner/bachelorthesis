@@ -20,12 +20,12 @@ plot "../../../Code/Analysis/ISING/576-Periodic2D/Data" using 5:($6+$7) lt rgb "
 !epstopdf Energie-Temperatur.eps && rm Energie-Temperatur.eps
 
 set key right top
-set output "Waerme-Temperatur.eps"
-set ylabel "Wärme pro Spin C/N [1]"
+set output "WaermeKapazitaet-Temperatur.eps"
+set ylabel "Wärme Kapazität pro Spin C/N [1]"
 plot "../../../Code/Analysis/ISING/576-Periodic2D/Data" using 5:($9+$10) lt rgb "#AAAAFF" with lines title "C/N + {/Symbol s}", \
 "../../../Code/Analysis/ISING/576-Periodic2D/Data" using 5:($9-$10) lt rgb "#AAAAFF" with lines title "C/N - {/Symbol s}", \
 "../../../Code/Analysis/ISING/576-Periodic2D/Data" using 5:9 lt rgb "#0000FF" with lines title "C/N"
-!epstopdf Waerme-Temperatur.eps && rm Waerme-Temperatur.eps
+!epstopdf WaermeKapazitaet-Temperatur.eps && rm WaermeKapazitaet-Temperatur.eps
 
 set key right top
 set output "Magnetisierung-Temperatur.eps"
