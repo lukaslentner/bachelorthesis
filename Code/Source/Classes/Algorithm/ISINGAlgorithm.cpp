@@ -5,7 +5,7 @@
 
 #include "AbstractAlgorithm.cpp"
 #include "../Analyzer/IsingEnergyAnalyzer.cpp"
-#include "../Analyzer/IsingSpecificHeatAnalyzer.cpp"
+#include "../Analyzer/IsingHeatCapacityAnalyzer.cpp"
 #include "../Analyzer/IsingMagnetisationAnalyzer.cpp"
 #include "../Analyzer/IsingSusceptibilityAnalyzer.cpp"
 #include "../Analyzer/IsingAbsoluteMagnetisationAnalyzer.cpp"
@@ -145,12 +145,12 @@ class ISINGAlgorithm : public AbstractAlgorithm {
       autoCorrelationTimeOfEnergy = isingEnergyAnalyzer->getAutoCorrelationTime();
       delete isingEnergyAnalyzer;
 
-      IsingSpecificHeatAnalyzer *isingSpecificHeatAnalyzer = new IsingSpecificHeatAnalyzer(this, lattice);
-      isingSpecificHeatAnalyzer->analyze();
-      averageSpecificHeat = isingSpecificHeatAnalyzer->getAverage();
-      errorOfSpecificHeat = isingSpecificHeatAnalyzer->getError();
-      autoCorrelationTimeOfSpecificHeat = isingSpecificHeatAnalyzer->getAutoCorrelationTime();
-      delete isingSpecificHeatAnalyzer;
+      IsingHeatCapacityAnalyzer *isingHeatCapacityAnalyzer = new IsingHeatCapacityAnalyzer(this, lattice);
+      isingHeatCapacityAnalyzer->analyze();
+      averageHeatCapacity = isingHeatCapacityAnalyzer->getAverage();
+      errorOfHeatCapacity = isingHeatCapacityAnalyzer->getError();
+      autoCorrelationTimeOfHeatCapacity = isingHeatCapacityAnalyzer->getAutoCorrelationTime();
+      delete isingHeatCapacityAnalyzer;
 
       IsingMagnetisationAnalyzer *isingMagnetisationAnalyzer = new IsingMagnetisationAnalyzer(this, lattice);
       isingMagnetisationAnalyzer->analyze();

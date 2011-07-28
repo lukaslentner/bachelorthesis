@@ -11,7 +11,7 @@
 # End-Temperature      = +6.00000000000000000000000e+00
 # Temperature-Step     = +1.00000000000000002081668e-02
 #
-# Size                        | Lattice-Index                | Measure-Count                | Algorithm-Index              | Temperature                  | Average Energy               | Error Of Energy              | ACorTime Of Energy           | Average Specific Heat        | Error Of Specific Heat       | ACorTime Of Specific Heat    | Average Magnetisation        | Error Of Magnetisation       | ACorTime Of Magnetisation    | Average Susceptibility       | Error Of Susceptibility      | ACorTime Of Susceptibility   | Average A Magnetisation      | Error Of A Magnetisation     | ACorTime Of A Magnetisation  | Average A Susceptibility     | Error Of A Susceptibility    | ACorTime Of A Susceptibility
+# Size                        | Lattice-Index                | Measure-Count                | Algorithm-Index              | Temperature                  | Average Energy               | Error Of Energy              | ACorTime Of Energy           | Average Heat Capacity        | Error Of Heat Capacity       | ACorTime Of Heat Capacity    | Average Magnetisation        | Error Of Magnetisation       | ACorTime Of Magnetisation    | Average Susceptibility       | Error Of Susceptibility      | ACorTime Of Susceptibility   | Average A Magnetisation      | Error Of A Magnetisation     | ACorTime Of A Magnetisation  | Average A Susceptibility     | Error Of A Susceptibility    | ACorTime Of A Susceptibility
 # Auto-Correlation of Energy=+1.0000000000000e+00
 # Auto-Correlation of Energy=+4.8592805484563e-01
 # Auto-Correlation of Energy=+2.6780111638782e-01

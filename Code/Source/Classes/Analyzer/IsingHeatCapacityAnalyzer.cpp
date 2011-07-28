@@ -1,15 +1,15 @@
-#ifndef CLASS_ISINGSPECIFICHEATANALYZER
-#define CLASS_ISINGSPECIFICHEATANALYZER
+#ifndef CLASS_ISINGHEATCAPACITYANALYZER
+#define CLASS_ISINGHEATCAPACITYANALYZER
 
 #include "AbstractAnalyzer.cpp"
 
-class IsingSpecificHeatAnalyzer : public AbstractAnalyzer {
+class IsingHeatCapacityAnalyzer : public AbstractAnalyzer {
   
   public:
   
-    IsingSpecificHeatAnalyzer(AbstractAlgorithm* algorithm_parameter, AbstractLattice* lattice_parameter) : AbstractAnalyzer(algorithm_parameter, lattice_parameter) {};
+    IsingHeatCapacityAnalyzer(AbstractAlgorithm* algorithm_parameter, AbstractLattice* lattice_parameter) : AbstractAnalyzer(algorithm_parameter, lattice_parameter) {};
 
-    ~IsingSpecificHeatAnalyzer() {};
+    ~IsingHeatCapacityAnalyzer() {};
     
     const char* getQuantityName() {
     

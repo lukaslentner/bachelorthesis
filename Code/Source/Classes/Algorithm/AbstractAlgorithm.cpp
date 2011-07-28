@@ -24,9 +24,9 @@ class AbstractAlgorithm {
     double errorOfEnergy;
     long autoCorrelationTimeOfEnergy;
     
-    double averageSpecificHeat;
-    double errorOfSpecificHeat;
-    long autoCorrelationTimeOfSpecificHeat;
+    double averageHeatCapacity;
+    double errorOfHeatCapacity;
+    long autoCorrelationTimeOfHeatCapacity;
     
     double averageMagnetisation;
     double errorOfMagnetisation;
@@ -86,9 +86,9 @@ class AbstractAlgorithm {
       errorOfEnergy = 0;
       autoCorrelationTimeOfEnergy = 0;
       
-      averageSpecificHeat = 0;
-      errorOfSpecificHeat = 0;
-      autoCorrelationTimeOfSpecificHeat = 0;
+      averageHeatCapacity = 0;
+      errorOfHeatCapacity = 0;
+      autoCorrelationTimeOfHeatCapacity = 0;
       
       averageMagnetisation = 0;
       errorOfMagnetisation = 0;
@@ -150,21 +150,21 @@ class AbstractAlgorithm {
     
     };
     
-    double getAverageSpecificHeat() {
+    double getAverageHeatCapacity() {
     
-      return averageSpecificHeat;
-    
-    };
-    
-    double getErrorOfSpecificHeat() {
-    
-      return errorOfSpecificHeat;
+      return averageHeatCapacity;
     
     };
     
-    long getAutoCorrelationTimeOfSpecificHeat() {
+    double getErrorOfHeatCapacity() {
     
-      return autoCorrelationTimeOfSpecificHeat;
+      return errorOfHeatCapacity;
+    
+    };
+    
+    long getAutoCorrelationTimeOfHeatCapacity() {
+    
+      return autoCorrelationTimeOfHeatCapacity;
     
     };
     
