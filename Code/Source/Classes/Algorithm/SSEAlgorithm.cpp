@@ -4,10 +4,8 @@
 #include <gsl/gsl_rng.h>
 
 #include "AbstractAlgorithm.cpp"
-/*#include "../Analyzer/EAnalyzer.cpp"
-#include "../Analyzer/HAnalyzer.cpp"
-#include "../Analyzer/MAnalyzer.cpp"
-#include "../Analyzer/SAnalyzer.cpp"*/
+#include "../Analyzer/SseEnergyAnalyzer.cpp"
+#include "../Analyzer/SseHeatCapacityAnalyzer.cpp"
 
 class SSEAlgorithm : public AbstractAlgorithm {
 
@@ -172,18 +170,6 @@ class SSEAlgorithm : public AbstractAlgorithm {
     
     };
     
-    int getSpinSum() {
-    
-      int spinSum = 0;
-    
-      for(int i = 0; i < lattice->getN(); i++) {
-        spinSum += spins[i] ? 0.5 : -0.5;
-      }
-      
-      return spinSum;
-    
-    };
-    
   public:
     
     SSEAlgorithm(AbstractLattice* lattice_parameter, int measureCount_parameter) : AbstractAlgorithm(lattice_parameter, measureCount_parameter) {
@@ -221,41 +207,26 @@ class SSEAlgorithm : public AbstractAlgorithm {
       for(long i = 0; i < runCount; i++) {
       
         if(i > runCount - measureCount) {
-          //energyMeasurements[i - runCount + measureCount] = -nr * t;
-          //magMeasurements[i - runCount + measureCount]    = fabs(double(getSpinSum()) / lattice->getN());
+          energyMeasurements[i - runCount + measureCount] = -double(nr) * t / lattice->getN();
         }
         
         doSweep();
         
       }
 
-/*      EAnalyzer *eAnalyzer = new EAnalyzer(this, lattice);
-      eAnalyzer->analyze();
-      avE = eAnalyzer->getAverage();
-      erE = eAnalyzer->getError();
-      atE = eAnalyzer->getAutoCorrelationTime();
-      delete eAnalyzer;
+      SseEnergyAnalyzer *sseEnergyAnalyzer = new SseEnergyAnalyzer(this, lattice);
+      sseEnergyAnalyzer->analyze();
+      averageEnergy = sseEnergyAnalyzer->getAverage() + (double(lattice->getNb()) / lattice->getN() / 4);
+      errorOfEnergy = sseEnergyAnalyzer->getError();
+      autoCorrelationTimeOfEnergy = sseEnergyAnalyzer->getAutoCorrelationTime();
+      delete sseEnergyAnalyzer;
 
-      HAnalyzer *hAnalyzer = new HAnalyzer(this, lattice);
-      hAnalyzer->analyze();
-      avH = hAnalyzer->getAverage();
-      erH = hAnalyzer->getError();
-      atH = hAnalyzer->getAutoCorrelationTime();
-      delete hAnalyzer;
-
-      MAnalyzer *mAnalyzer = new MAnalyzer(this, lattice);
-      mAnalyzer->analyze();
-      avM = mAnalyzer->getAverage();
-      erM = mAnalyzer->getError();
-      atM = mAnalyzer->getAutoCorrelationTime();
-      delete mAnalyzer;
-
-      SAnalyzer *sAnalyzer = new SAnalyzer(this, lattice);
-      sAnalyzer->analyze();
-      avS = sAnalyzer->getAverage();
-      erS = sAnalyzer->getError();
-      atS = sAnalyzer->getAutoCorrelationTime();
-      delete sAnalyzer;*/
+      SseHeatCapacityAnalyzer *sseHeatCapacityAnalyzer = new SseHeatCapacityAnalyzer(this, lattice);
+      sseHeatCapacityAnalyzer->analyze();
+      averageHeatCapacity = sseHeatCapacityAnalyzer->getAverage();
+      errorOfHeatCapacity = sseHeatCapacityAnalyzer->getError();
+      autoCorrelationTimeOfHeatCapacity = sseHeatCapacityAnalyzer->getAutoCorrelationTime();
+      delete sseHeatCapacityAnalyzer;
     
     };
 

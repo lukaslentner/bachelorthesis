@@ -19,12 +19,12 @@ set ylabel "Energy AutoCorrelation Time"
 plot "Data" using 5:8 lt rgb "#FF0000" with lines
 
 set key right bottom
-set output "SHeat-Temperature.eps"
-set title "Specific Heat - Temperature"
-set ylabel "Specific Heat"
-plot "Data" using 5:($9+$10) lt rgb "#FFAAAA" with lines title "Specific Heat + StdDev", \
-"Data" using 5:($9-$10) lt rgb "#FFAAAA" with lines title "Specific Heat - StdDev", \
-"Data" using 5:9 lt rgb "#FF0000" with lines title "Specific Heat"
+set output "HeatCapacity-Temperature.eps"
+set title "Heat Capacity - Temperature"
+set ylabel "Heat Capacity"
+plot "Data" using 5:($9+$10) lt rgb "#FFAAAA" with lines title "Heat Capacity + StdDev", \
+"Data" using 5:($9-$10) lt rgb "#FFAAAA" with lines title "Heat Capacity - StdDev", \
+"Data" using 5:9 lt rgb "#FF0000" with lines title "Heat Capacity"
 
 set key off
 set output "SHeatAutoCorrelationTime-Temperature.eps"

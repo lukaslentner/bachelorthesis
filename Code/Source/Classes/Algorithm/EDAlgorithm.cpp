@@ -94,7 +94,9 @@ class EDAlgorithm : public AbstractAlgorithm {
     
     };
     
-    void runTemperatureRound() {
+    void runTemperatureRound(double t_parameter) {
+    
+      AbstractAlgorithm::runTemperatureRound(t_parameter);
 
       double sumOfE = 0;
       double sumOfESquared = 0;
@@ -106,10 +108,9 @@ class EDAlgorithm : public AbstractAlgorithm {
         sumOfESquared += weight * pow((*e)[s], 2);
         z += weight;
       }
-
-      //avE = sumOfE / z;
-      //avH = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2);
-      //avS = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / t / lattice->getN();
+      
+      averageEnergy = sumOfE / z / lattice->getN();
+      averageHeatCapacity = ((sumOfESquared / z) - pow(sumOfE / z, 2)) / pow(t, 2) / lattice->getN();
       
     };
     
