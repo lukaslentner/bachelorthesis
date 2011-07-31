@@ -1,20 +1,20 @@
-\chapter[Theorie der Monte Carlo Simulation]{Theorie der\\ Monte Carlo Simulation}
+\chapter[Theorie der Monte-Carlo Simulation]{Theorie der\\ Monte-Carlo Simulation}
 
 \section{Geschichte}
 
-Basierend auf den Ideen von Enrico Fermi (um 1935) verwendete zum ersten Mal Stanislaw Ulam und John von Neumann um 1945 das Prinzip der Monte Carlo Methode während ihrer Arbeit am Los Alamos Scientific Laboratory.
+Basierend auf den Ideen von Enrico Fermi (um 1935) verwendete zum ersten Mal Stanislaw Ulam und John von Neumann um 1945 das Prinzip der Monte-Carlo Methode während ihrer Arbeit am Los Alamos Scientific Laboratory.
 
-Der von Nicholas Metropolis gewählte Name bezieht sich auf die Spielbank Monte Carlo, die im gleichnamigen Stadtteil des Stadtstaates Monaco liegt. Anlass hierfür soll Ulams Onkel gegeben haben, der sich mehrmals von Verwandten Geld zum spielen leihen wollte \cite{mchistory}.
+Der von Nicholas Metropolis gewählte Name bezieht sich auf die Spielbank Monte-Carlo, die im gleichnamigen Stadtteil des Stadtstaates Monaco liegt. Anlass hierfür soll Ulams Onkel gegeben haben, der sich mehrmals von Verwandten Geld zum Spielen leihen wollte \cite{MCHistory}.
 
 Heute findet die Methode zahlreiche Anwendungen in der Statistischen Physik, Numerik und Optimierung.
 
 \section{Ziel}
 
-Die Idee der Monte Carlo Simulation (MCS) lässt sich beschreiben als ein gewichteter Weg durch einen $n$-dimensionalen Zustandsraum $\Omega$. Hierbei interessiert man sich speziell für den statistischen Mittelwert einer Größe $A$,
+Die Idee der Monte-Carlo Simulation (MCS) lässt sich beschreiben als einen Weg durch einen $n$-dimensionalen Zustandsraum $\Omega$, dessen Zustände gewichtet sind (Wahrscheinlichkeitsraum). Hierbei interessiert man sich speziell für den statistischen Mittelwert einer Größe $A$,
 
 \begin{equation}
 \langle A\rangle =\sum_{\sigma\in\Omega}p_\sigma\cdot A(\sigma )\ \mathrm{.}
-\label{equ:mittelwert}
+\label{eq:Mittelwert}
 \end{equation}
 
 $p_\sigma$ steht hier für die Wahrscheinlichkeit des Zustandes $\sigma$ und $A(\sigma )$ ist der Wert der Größe $A$ bei diesem Zustand. Für kontinuierliche Fälle ersetzt man die Summe durch ein Integral.
@@ -25,7 +25,7 @@ Oft ist es nicht möglich, die oben angegebene Summe auszuwerten (z.B. wenn $\Ome
 
 \begin{equation}
 \langle A\rangle\approx\overline{A}=\frac{1}{M}\sum_{m=0}^{M-1}A(\sigma_m)\ \mathrm{,}
-\label{equ:markov_mittelwert}
+\label{eq:MarkovMittelwert}
 \end{equation}
 
 genähert werden.
@@ -35,93 +35,96 @@ Eine Markov-Kette beginnt mit einem beliebigen Anfangszustand $\sigma_0$. Von di
 \begin{enumerate}
 \item Die Bildung der Kette muss {\bfseries ergodisch} sein. D.h. sie muss theoretisch alle Zustände enthalten können, was sie in der Praxis natürlich nicht tut, da wir $M\ll \left|\Omega\right|$ wählen.
 \item Die Übergangswahrscheinlichkeiten $\boldsymbol{W}$ müssen insofern im {\bfseries Gleichgewicht} sein, als dass
-\end{enumerate}
 
 \begin{equation}
 \sum_{\sigma\in\Omega}p_\sigma\cdot W_{\sigma\nu}=p_\nu\ \mathrm{.}
-\label{equ:balanced}
+\label{eq:Balanced}
 \end{equation}
+
+Wir fordern also, dass die gewünschte Wahrscheinlichkeitsverteilung ein Fixpunkt der Markov-Kette darstellt (Stationäre Lösung).
+\end{enumerate}
 
 Eine deutlich stärkere Bedingung als b) stellt {\itshape Detailed Balance} (dt. detailiertes Gleichgewicht) dar,
 
 \begin{equation}
 p_\sigma\cdot W_{\sigma\nu}=p_\nu\cdot W_{\nu\sigma}\ \mathrm{.}
-\label{equ:detailedBalance}
+\label{eq:DetailedBalance}
 \end{equation}
 
-In Worten besagt sie, dass ein Sprung von einem Markov-Kettenglied zum Nachbar genauso wahrscheinlich ist, wie andersherum. Die Kette besitzt also keine ausgezeichnete Richtung.
+In Worten besagt sie, dass ein Sprung von einem Markov-Kettenglied zum Nachbar genauso wahrscheinlich ist, wie andersherum. Die Kette besitzt also keine ausgezeichnete Richtung -- es handelt sich um einen reversiblen Prozess im Thermodynamischen Sinne.
 
-Gleichung \ref{equ:detailedBalance} erfüllt automatisch Gl. \ref{equ:balanced}, da
+Gleichung \ref{eq:DetailedBalance} erfüllt automatisch Gl. \ref{eq:Balanced}, da
 
 \begin{equation}
 \sum_{\sigma\in\Omega}p_\sigma\cdot W_{\sigma\nu}=\sum_{\sigma\in\Omega}p_\nu\cdot W_{\nu\sigma}=p_\nu\cdot\sum_{\sigma\in\Omega}W_{\nu\sigma}=p_\nu\ \mathrm{.}
-\label{equ:detailedBalanceIsBalanced}
+\label{eq:DetailedBalanceIsBalanced}
 \end{equation}
 
-Hierbei verwendet man im letzten Schritt, dass der Zustand $\nu$ in jedem Fall in irgendeinen nächsten Zustand $\sigma$ übergeht. Diese zunächst starke Einschränkung wird häufig verwendet, um der Bedingung b) zu genügen. Später werden wir sehen, dass sie in unserem Fall auch die Berechnung von $\boldsymbol{W}$ deutlich vereinfacht.
+Hierbei verwendet man im letzten Schritt, dass der Zustand $\nu$ in jedem Fall in irgendeinen nächsten Zustand $\sigma$ übergeht.
 
 \section{Metropolis Algorithmus}
 
-Ein möglicher Algorithmus zur Bestimmung der Übergangswahrscheinlichkeiten $\boldsymbol{W}$ wurde 1953 von Nicholas Metropolis et al. vorgestellt \cite{metropolis},
+Ein möglicher Algorithmus zur Bestimmung der Übergangswahrscheinlichkeiten $\boldsymbol{W}$ wurde 1953 von Nicholas Metropolis et al. vorgestellt \cite{Metropolis},
 
 \begin{equation}
 W_{\nu\sigma}=\begin{cases}
 p_\sigma/p_\nu & p_\sigma<p_\nu\\
 1              & p_\sigma\geq p_\nu\ \mathrm{.}
 \end{cases}
-\label{equ:metropolis}
+\label{eq:Metropolis}
 \end{equation}
 
-Es kann leicht gezeigt werden, dass der Vorschlag die {\itshape Detailed Balance} (Gl. \ref{equ:detailedBalance}) erfüllt. Ein weiterer Algorithmus ist nach Roj J. Glauber benannt ({\itshape Glauber dynamics}) \cite{glauber}.
+Es kann leicht gezeigt werden, dass der Vorschlag die {\itshape Detailed Balance} (Gl. \ref{eq:DetailedBalance}) erfüllt. Ein weiterer Algorithmus ist nach Roj J. Glauber benannt ({\itshape Glauber dynamics}) \cite{Glauber}.
 
 \section{Thermalisierung}
 
-Nachdem als Anfangszustand der Markov-Kette ein beliebig ausgewählter Zustand verwendet wird, ist es ziemlich unwahrscheinlich, dass dieser Zustand ein hohes Wahrscheinlichkeitsgewicht $P_\sigma$ besitzt. Es wird sich also nicht um einen Zustand im Gleichgewicht handeln. Aus diesem Grund sollte vor der eigentlichen Messung eine genügend große Anzahl von Thermalisierungsschritten (MC-Schritte) durchgeführt werden.
+Nachdem als Anfangszustand der Markov-Kette ein beliebig ausgewählter Zustand verwendet wird, ist es ziemlich unwahrscheinlich, dass dieser Zustand ein hohes Wahrscheinlichkeitsgewicht $P_\sigma$ besitzt. Es wird sich also nicht um einen Zustand im Gleichgewicht handeln. Aus diesem Grund sollte vor der eigentlichen Messung ($\widetilde{R}$ MC-Schritte) eine genügend große Anzahl $\widehat{R}$ von Thermalisierungsschritten durchgeführt werden, während denen keine Messungen durchgeführt wird. Insgesamt sind dann $R=\widehat{R}+\widetilde{R}$ Monte-Carlo Schritte von Nöten.
 
-In der Praxis werden entweder Erfahrungswerte verwendet, die eine konstante, meist zu große Schrittanzahl erfordern oder die Daten werden vollständig gespeichert und in der Auswertung sortiert. Im Nachhinein kann über tatsächliche Wahrscheinlichkeitsverteilung auf die Thermalisierungsphase geschlossen werden. Diese Daten werden dann für die anschließende Analyse nicht verwendet.
+In der Praxis werden für $\widehat{R}$ entweder Erfahrungswerte verwendet, die eine konstante, meist zu große Schrittanzahl (z.B. $\widehat{R}=\frac{3}{2}\widetilde{R}$) erfordern oder die Daten werden vollständig gespeichert und in der Auswertung sortiert. Im Nachhinein kann über tatsächliche Wahrscheinlichkeitsverteilung auf die Thermalisierungsphase geschlossen werden.
 
 \section{Autokorrelationsfunktion und Fehlerberechnung}
+\label{sec:Autokorrelation}
 
 Alle Messwerte der Größe $A$ müssen nach der Termalisierung in der Auswertung statistisch interpretiert werden. Dabei ist zu beachten, dass die Daten von aufeinanderfolgenden Zuständen statistisch abhängig sind. Wie viele MC-Schritte zwischen zwei Messungen notwendig sind, um unabhängige Werte zu erhalten, gibt die Autokorrelationszeit $\tau_A$ an (Im weiteren ist mit "`Zeit"' immer die Simulationszeit gemessen in MC-Schritten gemeint). Zur Berechnung derselben wird die Autokorrelationsfunktion
 
 \begin{equation}
 \Theta_A(t)=\frac{\langle A(\sigma_{i+t})\cdot A(\sigma_i)\rangle-\langle A\rangle^2}{\langle A^2\rangle-\langle A\rangle^2}
-\label{equ:autokorrelationsfunktion}
+\label{eq:Autokorrelationsfunktion}
 \end{equation}
 
-betrachtet. Hierbei läuft die Mittelwertbildung mit der Variable $i$ über die gesamte ausgewertete Simulationszeit $\widetilde{M}$ (Die gesamte Simulationszeit beträgt $M$). Sie ist in solch einer Weise normiert, dass $\Theta_A(\sigma_0)=1$ und $\Theta_A(\sigma_{t\rightarrow\infty})=0$. Die Autokorrelationsfunktion hängt sodann mit der Autokorrelationszeit negativ exponentiell zusammen,
+betrachtet. Hierbei läuft die Mittelwertbildung mit der Variable $i$ über die gesamte ausgewertete Simulationszeit $\widetilde{M}$. $\Theta_A$ ist in solch einer Weise normiert, dass $\Theta_A(0)=1$ und $\Theta_A(t\rightarrow\infty)=0$. Die Autokorrelationsfunktion hängt sodann mit der Autokorrelationszeit negativ exponentiell zusammen,
 
 \begin{equation}
 \Theta_A(t)\sim e^{-t/\tau_A}\ \mathrm{.}
-\label{equ:autokorrelationszeit}
+\label{eq:Autokorrelationszeit}
 \end{equation}
 
 Nachdem $\tau_A$ auf diese Art ermittelt wurde, können die Messwerte in Gruppen mit der Länge $3\cdot\tau_A$ gebündelt und unabhängige Gruppenmittelwerte
 
 \begin{equation}
 \overline{A}_b=\frac{1}{3\tau_A}\sum_{i=0}^{3\tau_A - 1}A(\sigma_{b\cdot\tau_a+i})
-\label{equ:gruppenmittelwert}
+\label{eq:Gruppenmittelwert}
 \end{equation}
 
-berechnet werden, wobei $b$ hier der null-basierte Gruppen-Index ist und die Anzahl der Gruppen
+berechnet werden, wobei $b$ hier der Gruppen-Index ist und die Anzahl der Gruppen
 
 \begin{equation}
 B=\left\lfloor\frac{\widetilde{M}}{3\tau_A}\right\rfloor\ \mathrm{.}
-\label{equ:gruppenanzahl}
+\label{eq:Gruppenanzahl}
 \end{equation}
 
-Nach dem zentralen Grenzwert Satz folgen diese Gruppenmittelwerte sodann einer Gauß-Vertei\-lung, welche den exakten Wert
+Nach dem zentralen Grenzwert Satz folgen diese Gruppenmittelwerte sodann einer Gauß-Vertei\-lung, deren Erwartungswert der exakte Wert
 
 \begin{equation}
 \overline{A}=\frac{1}{B}\sum_{b=0}^{B-1}\overline{A}_b
-\label{equ:exact}
+\label{eq:Exakt}
 \end{equation}
 
-in der Mitte hält. Als Fehler kann eine Standardabweichung, also 
+ist. Als Fehler kann die Standardabweichung, also 
 
 \begin{equation}
 \sigma_A=\sqrt{\frac{1}{B(B-1)}\sum_{b=0}^{B-1}(\overline{A}_b-\overline{A})^2}
-\label{equ:error}
+\label{eq:Fehler}
 \end{equation}
 
 angegeben werden.

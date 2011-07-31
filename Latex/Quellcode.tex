@@ -1,4 +1,5 @@
 \chapter{Quellcode}
+\label{sec:code}
 
 \section{Hauptprogramm SIM}
 
@@ -46,18 +47,34 @@
 
 \cppcodefile[label=code:AbstractAnalyzer]{Classes/Analyzer/AbstractAnalyzer.cpp}
 
-\subsection{Analysemodul für die Energie}
+\subsection{Analysemodul für die Energie (Ising)}
 
-\cppcodefile[label=code:EAnalyzer]{Classes/Analyzer/EAnalyzer.cpp}
+\cppcodefile[label=code:IsingEnergyAnalyzer]{Classes/Analyzer/IsingEnergyAnalyzer.cpp}
 
-\subsection{Analysemodul für die Spezifische Wärme}
+\subsection{Analysemodul für die Wärme Kapazität (Ising)}
 
-\cppcodefile[label=code:HAnalyzer]{Classes/Analyzer/HAnalyzer.cpp}
+\cppcodefile[label=code:IsingHeatCapacityAnalyzer]{Classes/Analyzer/IsingHeatCapacityAnalyzer.cpp}
 
-\subsection{Analysemodul für die Magnetisierung pro Spin}
+\subsection{Analysemodul für die Magnetisierung (Ising)}
 
-\cppcodefile[label=code:MAnalyzer]{Classes/Analyzer/MAnalyzer.cpp}
+\cppcodefile[label=code:IsingMagnetisationAnalyzer]{Classes/Analyzer/IsingMagnetisationAnalyzer.cpp}
 
-\subsection{Analysemodul für die Magnetische Suszeptibilität}
+\subsection{Analysemodul für die Magnetische Suszeptibilität (Ising)}
 
-\cppcodefile[label=code:SAnalyzer]{Classes/Analyzer/SAnalyzer.cpp}
+\cppcodefile[label=code:IsingSusceptibilityAnalyzer]{Classes/Analyzer/IsingSusceptibilityAnalyzer.cpp}
+
+\subsection{Analysemodul für die Abs. Magnetisierung (Ising)}
+
+\cppcodefile[label=code:IsingAbsoluteMagnetisationAnalyzer]{Classes/Analyzer/IsingAbsoluteMagnetisationAnalyzer.cpp}
+
+\subsection{Analysemodul für die Abs., Mag. Suszeptibilität (Ising)}
+
+\cppcodefile[label=code:IsingAbsoluteSusceptibilityAnalyzer]{Classes/Analyzer/IsingAbsoluteSusceptibilityAnalyzer.cpp}
+
+\subsection{Analysemodul für die Energie (SSE)}
+
+\cppcodefile[label=code:SseEnergyAnalyzer]{Classes/Analyzer/SseEnergyAnalyzer.cpp}
+
+\subsection{Analysemodul für die Wärme Kapazität (SSE)}
+
+\cppcodefile[label=code:SseHeatCapacityAnalyzer]{Classes/Analyzer/SseHeatCapacityAnalyzer.cpp}
