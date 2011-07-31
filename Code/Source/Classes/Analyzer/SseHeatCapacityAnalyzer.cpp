@@ -19,8 +19,10 @@ class SseHeatCapacityAnalyzer : public AbstractAnalyzer {
     
     double getQuantity(long time) {
     
-      return (pow(algorithm->getEnergyMeasurement(time), 2) * lattice->getN() / pow(algorithm->getTemperature(), 2)) - (pow(algorithm->getAverageEnergy(), 2) * lattice->getN() / pow(algorithm->getTemperature(), 2)) + (algorithm->getAverageEnergy() / algorithm->getTemperature());
-    
+      double averageNr = ((algorithm->getAverageEnergy() - (double(lattice->getNb()) / lattice->getN() / 4)) * -lattice->getN() / algorithm->getTemperature());
+      
+      return (pow(-algorithm->getEnergyMeasurement(time) * lattice->getN() / algorithm->getTemperature(), 2) - pow(averageNr, 2) - averageNr)/lattice->getN();
+
     };
   
 };

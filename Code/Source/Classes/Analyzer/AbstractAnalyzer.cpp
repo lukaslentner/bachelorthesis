@@ -69,7 +69,7 @@ class AbstractAnalyzer {
       
         long binsCount = algorithm->getMeasureCount() / 3 / autoCorrelationTime;
         double *binAverage = new double[binsCount];
-
+        
         for(long bin = 0; bin < binsCount; bin++) {
           binAverage[bin] = (sum[(bin + 1) * 3 * autoCorrelationTime] - sum[bin * 3 * autoCorrelationTime]) / 3 / autoCorrelationTime;
           average += binAverage[bin] / binsCount;

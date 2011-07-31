@@ -203,13 +203,13 @@ class SSEAlgorithm : public AbstractAlgorithm {
     void runTemperatureRound(double t_parameter) {
     
       AbstractAlgorithm::runTemperatureRound(t_parameter);
-    
+      
       for(long i = 0; i < runCount; i++) {
       
         if(i > runCount - measureCount) {
           energyMeasurements[i - runCount + measureCount] = -double(nr) * t / lattice->getN();
+          magnetisationMeasurements[i - runCount + measureCount] = nr;
         }
-        
         doSweep();
         
       }
