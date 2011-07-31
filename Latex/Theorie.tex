@@ -1,39 +1,43 @@
+\newpage
+\thispagestyle{empty}
+\cleardoublepage
 \chapter[Theorie der Monte-Carlo Simulation]{Theorie der\\ Monte-Carlo Simulation}
 
 \section{Geschichte}
 
-Basierend auf den Ideen von Enrico Fermi (um 1935) verwendete zum ersten Mal Stanislaw Ulam und John von Neumann um 1945 das Prinzip der Monte-Carlo Methode während ihrer Arbeit am Los Alamos Scientific Laboratory.
+1945 begann am Los Alamos Scientific Laboratory die erste ernsthafte Auseinandersetzung mit Strahlenschutz. Die Forscher suchten nach einer Möglichkeit, den Weg von Neutronen durch unterschiedliche Materialien vorherzusagen, was aufgrund der oft komplizierten Geometrie nur noch schwer analytisch geschehen konnte. Dabei erkannten die Physiker Stanislaw Ulam und John von Neumann schließlich (basierend auf den Ideen von Enrico Fermi um 1935) die Mächtigkeit eines {\bfseries stochatischen Ansatzes}, bei dem durch Verfolgen einzelner Trajektorien von Teilchen in größerer Anzahl schnell auf eine gute Näherung der tatsächlichen Inten\-sitäts-/Wahrschein\-lichkeits\-verteilung geschlossen werden kann \cite{MCHistory}.
 
-Der von Nicholas Metropolis gewählte Name bezieht sich auf die Spielbank Monte-Carlo, die im gleichnamigen Stadtteil des Stadtstaates Monaco liegt. Anlass hierfür soll Ulams Onkel gegeben haben, der sich mehrmals von Verwandten Geld zum Spielen leihen wollte \cite{MCHistory}.
+Nicholas Metropolis, ebenfalls an dem Projekt beteiligt, gab dem Verfahren den Namen {\bfseries Monte-Carlo Methode}, welcher sich auf die Spielbank Monte-Carlo, die im gleichnamigen Stadtteil des Stadtstaates Monaco liegt, bezieht. Anlass hierfür soll Ulams Onkel gegeben haben, der sich mehrmals von Verwandten Geld zum Spielen leihen wollte \cite{MCHistory}.
 
-Heute findet die Methode zahlreiche Anwendungen in der Statistischen Physik, Numerik und Optimierung.
+Heute findet die Methode zahlreiche Anwendungen in der Statistischen Physik, Numerik und Optimierung. In der Teilchenphysik beispielsweise werden Zerfallsbäume von Atomen auf ihre Häufigkeits-/Wahrscheinlichkeitsverteilung der Zwischenprodukte hin untersucht \cite{Pythia}, während mit dem selben Verfahren in der Thermodynamik die Wahrscheinlichkeitsverteilung der Mikroskopischen Zustände verfolgt wird \cite{Buch}. Weiterhin gibt es ganz klassische Beispiele als Anwendung, wie die Monte-Carlo Integration oder die Approximation von $\pi$.
 
+\newpage
 \section{Ziel}
 
-Die Idee der Monte-Carlo Simulation (MCS) lässt sich beschreiben als einen Weg durch einen $n$-dimensionalen Zustandsraum $\Omega$, dessen Zustände gewichtet sind (Wahrscheinlichkeitsraum). Hierbei interessiert man sich speziell für den statistischen Mittelwert einer Größe $A$,
+Das Ziel der {\bfseries Monte-Carlo Simulation} (MCS) ist die Berechnung eines statistischen Mittels einer Größe $A$ in einem $n$-dimensionalen Zustandsraum $\Omega$, dessen Zustände a priori gewichtet sind (Wahrscheinlichkeitsraum):
 
 \begin{equation}
-\langle A\rangle =\sum_{\sigma\in\Omega}p_\sigma\cdot A(\sigma )\ \mathrm{.}
+\langle A\rangle =\sum_{\sigma\in\Omega}p_\sigma\cdot A(\sigma )
 \label{eq:Mittelwert}
 \end{equation}
 
 $p_\sigma$ steht hier für die Wahrscheinlichkeit des Zustandes $\sigma$ und $A(\sigma )$ ist der Wert der Größe $A$ bei diesem Zustand. Für kontinuierliche Fälle ersetzt man die Summe durch ein Integral.
 
-\section{Markov-Kette}
+Beispiele hierfür reichen von der genannten Häufigkeitsverteilung von Zwischenprodukten über Boltzmann-gewichtete Mikrozustände (s. Kapitel \ref{sec:Ising}) bis zum Operatorstring, welcher einer gegebenen, quantenmechanischen Amplitudenverteilung folgt (s. Kapitel \ref{sec:SSE}).
 
-Oft ist es nicht möglich, die oben angegebene Summe auszuwerten (z.B. wenn $\Omega$ sehr groß ist). In diesem Fall kann der Zustandsraum quasidicht durch eine Markov-Kette von $M$ Zuständen $\sigma_0, \sigma_1, \ldots \sigma_{M-1}$ abgelaufen werden. Die Häufigkeit eines Zustandes $\sigma$ in der Kette soll im Grenzfall $M\rightarrow\infty$ genau der Wahrscheinlichkeit des Zustandes $p_\sigma$ entsprechen (Importance Sampling). Der Mitterwert kann sodann erheblich leichter nach dem Gesetz für große Zahlen durch das arithmetische Mittel über die Kette, also
+\section{Idee: Markov-Kette}
+
+Oft ist es nicht möglich, die oben angegebene Summe auszuwerten (z.B. wenn $\Omega$ sehr groß ist). In diesem Fall wollen wir den Zustandsraum quasidicht durch eine Markov-Kette von $R$ Zuständen $\sigma_0, \sigma_1, \ldots \sigma_{R-1}$ ablaufen. Die Häufigkeit eines Zustandes $\sigma$ in der Kette soll sich dabei im Grenzfall $R\rightarrow\infty$ genau der Wahrscheinlichkeit des Zustandes $p_\sigma$ annähern (Importance Sampling). Der Mitterwert kann sodann erheblich leichter nach dem {\itshape Gesetz für große Zahlen} durch das arithmetische Mittel über die Kette approximiert werden:
 
 \begin{equation}
-\langle A\rangle\approx\overline{A}=\frac{1}{M}\sum_{m=0}^{M-1}A(\sigma_m)\ \mathrm{,}
+\langle A\rangle\approx\overline{A}=\frac{1}{M}\sum_{m=0}^{M-1}A(\sigma_m)
 \label{eq:MarkovMittelwert}
 \end{equation}
 
-genähert werden.
-
-Eine Markov-Kette beginnt mit einem beliebigen Anfangszustand $\sigma_0$. Von diesem aus werden mit einer Übergangswahrscheinlichkeit $W_{\sigma_0\sigma_1}$ Sprünge im Zustandsraum ausgeführt (MC-Schritte), welche die neuen Kettenglieder $\sigma_2\ldots$ definieren. Damit die Markov-Kette zur gewünschten Wahrscheinlichkeitsverteilung führt, muss bei der Bildung von $\boldsymbol{W}$ auf die zwei folgenden Bedingungen geachtet werden:
+Eine Markov-Kette beginnt mit einem beliebigen Anfangszustand $\sigma_0$. Von diesem aus werden mit einer Übergangswahrscheinlichkeit $(\boldsymbol{W})_{\sigma_0\sigma_1}$ Sprünge im Zustandsraum ausgeführt (MC-Schritte), welche die neuen Kettenglieder $\sigma_2\sigma_3\ldots$ definieren. Damit die Markov-Kette zur gewünschten Wahrscheinlichkeitsverteilung $p_\sigma$ führt, muss bei der Bildung von $\boldsymbol{W}$ auf die zwei folgenden Bedingungen geachtet werden:
 
 \begin{enumerate}
-\item Die Bildung der Kette muss {\bfseries ergodisch} sein. D.h. sie muss theoretisch alle Zustände enthalten können, was sie in der Praxis natürlich nicht tut, da wir $M\ll \left|\Omega\right|$ wählen.
+\item Die Bildung der Kette muss der {\bfseries Ergodizität} folgen. D.h. sie muss theoretisch alle Zustände erreichen können (was sie in der Praxis natürlich nicht tut, da wir $R\ll \left|\Omega\right|$ wählen).
 \item Die Übergangswahrscheinlichkeiten $\boldsymbol{W}$ müssen insofern im {\bfseries Gleichgewicht} sein, als dass
 
 \begin{equation}
@@ -41,90 +45,88 @@ Eine Markov-Kette beginnt mit einem beliebigen Anfangszustand $\sigma_0$. Von di
 \label{eq:Balanced}
 \end{equation}
 
-Wir fordern also, dass die gewünschte Wahrscheinlichkeitsverteilung ein Fixpunkt der Markov-Kette darstellt (Stationäre Lösung).
+Wir fordern also, dass die gewünschte Wahrscheinlichkeitsverteilung einen Fixpunkt der Markov-Kette darstellt (Stationäre Lösung).
 \end{enumerate}
 
-Eine deutlich stärkere Bedingung als b) stellt {\itshape Detailed Balance} (dt. detailiertes Gleichgewicht) dar,
+Eine deutlich stärkere Bedingung als b) stellt die sog. {\bfseries Detailed Balance} (dt. detailiertes Gleichgewicht) dar:
 
 \begin{equation}
-p_\sigma\cdot W_{\sigma\nu}=p_\nu\cdot W_{\nu\sigma}\ \mathrm{.}
+p_\sigma\cdot W_{\sigma\nu}=p_\nu\cdot W_{\nu\sigma}
 \label{eq:DetailedBalance}
 \end{equation}
 
-In Worten besagt sie, dass ein Sprung von einem Markov-Kettenglied zum Nachbar genauso wahrscheinlich ist, wie andersherum. Die Kette besitzt also keine ausgezeichnete Richtung -- es handelt sich um einen reversiblen Prozess im Thermodynamischen Sinne.
-
-Gleichung \ref{eq:DetailedBalance} erfüllt automatisch Gl. \ref{eq:Balanced}, da
+Anschaulich besagt sie, dass ein Sprung von einem Markov-Kettenglied zum Nachbar genauso wahrscheinlich ist, wie in Gegenrichtung. Die Kette besitzt also keine ausgezeichnete Richtung -- es handelt sich um einen {\itshape reversiblen Prozess} im thermodynamischen Sinne (s. Kapitel 9 in \cite{Buch}). Die {\bfseries Detailed Balance} stellt immer schon ein {\bfseries Gleichgewicht} dar, da
 
 \begin{equation}
 \sum_{\sigma\in\Omega}p_\sigma\cdot W_{\sigma\nu}=\sum_{\sigma\in\Omega}p_\nu\cdot W_{\nu\sigma}=p_\nu\cdot\sum_{\sigma\in\Omega}W_{\nu\sigma}=p_\nu\ \mathrm{.}
 \label{eq:DetailedBalanceIsBalanced}
 \end{equation}
 
-Hierbei verwendet man im letzten Schritt, dass der Zustand $\nu$ in jedem Fall in irgendeinen nächsten Zustand $\sigma$ übergeht.
+Hierbei verwendet man im letzten Schritt, dass der Zustand $\nu$ in jedem Fall in irgendeinen nächsten Zustand $\sigma$ übergeht, die Zeilensummen der Matrix also jeweils 1 ergeben.
 
 \section{Metropolis Algorithmus}
 
-Ein möglicher Algorithmus zur Bestimmung der Übergangswahrscheinlichkeiten $\boldsymbol{W}$ wurde 1953 von Nicholas Metropolis et al. vorgestellt \cite{Metropolis},
+Die MCS erfordert also für eine gegebene Wahrscheinlichkeitsverteilung $p_\sigma$ eine Wahl der Übergangswahrscheinlichkeiten $\boldsymbol{W}$, sodass $p_\sigma$ {\bfseries stationär} ist. 1953 stellte Nicholas Metropolis {\itshape et al.} eine solche Wahl vor:
 
 \begin{equation}
 W_{\nu\sigma}=\begin{cases}
 p_\sigma/p_\nu & p_\sigma<p_\nu\\
-1              & p_\sigma\geq p_\nu\ \mathrm{.}
+1              & p_\sigma\geq p_\nu
 \end{cases}
 \label{eq:Metropolis}
 \end{equation}
 
-Es kann leicht gezeigt werden, dass der Vorschlag die {\itshape Detailed Balance} (Gl. \ref{eq:DetailedBalance}) erfüllt. Ein weiterer Algorithmus ist nach Roj J. Glauber benannt ({\itshape Glauber dynamics}) \cite{Glauber}.
+Es kann leicht gezeigt werden, dass dieser Vorschlag sogar {\itshape Detailed Balance} (Gl. \ref{eq:DetailedBalance}) erfüllt. Ein weiterer Algorithmus ist nach Roj J. Glauber benannt ({\itshape Glauber dynamics}) \cite{Glauber}.
 
 \section{Thermalisierung}
 
-Nachdem als Anfangszustand der Markov-Kette ein beliebig ausgewählter Zustand verwendet wird, ist es ziemlich unwahrscheinlich, dass dieser Zustand ein hohes Wahrscheinlichkeitsgewicht $P_\sigma$ besitzt. Es wird sich also nicht um einen Zustand im Gleichgewicht handeln. Aus diesem Grund sollte vor der eigentlichen Messung ($\widetilde{R}$ MC-Schritte) eine genügend große Anzahl $\widehat{R}$ von Thermalisierungsschritten durchgeführt werden, während denen keine Messungen durchgeführt wird. Insgesamt sind dann $R=\widehat{R}+\widetilde{R}$ Monte-Carlo Schritte von Nöten.
+Nachdem als Anfangszustand der Markov-Kette ein beliebig ausgewählter Zustand verwendet wird, werden die ersten Kettenglieder in ihrer Verteilung noch weit von der angestrebten Wahrscheinlichkeitsverteilung $p_\sigma$ abweichen, auch weil die verlangte {\bfseries Ergodizität} in den wenigen Schritten noch gar nicht zum Tragen kommen konnte.
 
-In der Praxis werden für $\widehat{R}$ entweder Erfahrungswerte verwendet, die eine konstante, meist zu große Schrittanzahl (z.B. $\widehat{R}=\frac{3}{2}\widetilde{R}$) erfordern oder die Daten werden vollständig gespeichert und in der Auswertung sortiert. Im Nachhinein kann über tatsächliche Wahrscheinlichkeitsverteilung auf die Thermalisierungsphase geschlossen werden.
+Den Vorgang, bis zum ersten Mal eine hinreichend gute Übereinstimmung mit $p_\sigma$ vorliegt, nennt man {\bfseries Thermalisierung}: Vor der eigentlichen Messung ($R_1$ MC-Schritte) muss also eine genügend große Anzahl $R_0$ von Thermalisierungsschritten durchgeführt werden, während deren noch keine Messungen durchgeführt werden. Insgesamt sind dann $R=R_0+R_1$ Monte-Carlo Schritte vonnöten.
+
+In der Praxis, wie auch in dieser Arbeit, werden für $R_0$ oft Erfahrungswerte verwendet, die eine konstante, meist zu große Schrittanzahl erfordern (z.B. $R_0=\frac{3}{2}R_1$). Alternativ können die einzelnen Messdaten auch vollständig gespeichert und in der Auswertung sortiert werden. Im Nachhinein kann dann über die tatsächliche Wahrscheinlichkeitsverteilung auf die Thermalisierungsphase geschlossen werden.
 
 \section{Autokorrelationsfunktion und Fehlerberechnung}
 \label{sec:Autokorrelation}
 
-Alle Messwerte der Größe $A$ müssen nach der Termalisierung in der Auswertung statistisch interpretiert werden. Dabei ist zu beachten, dass die Daten von aufeinanderfolgenden Zuständen statistisch abhängig sind. Wie viele MC-Schritte zwischen zwei Messungen notwendig sind, um unabhängige Werte zu erhalten, gibt die Autokorrelationszeit $\tau_A$ an (Im weiteren ist mit "`Zeit"' immer die Simulationszeit gemessen in MC-Schritten gemeint). Zur Berechnung derselben wird die Autokorrelationsfunktion
+Alle Messwerte der Größe $A$ müssen nach der Termalisierung in der Auswertung statistisch interpretiert werden. Dabei ist zu beachten, dass die Daten von aufeinanderfolgenden Zuständen statistisch abhängig sind. Wie viele MC-Schritte zwischen zwei Messungen notwendig sind, um unabhängige Werte zu erhalten, gibt die {\bfseries Autokorrelationszeit} $\tau_A$ an (im weiteren ist mit "`Zeit"' immer die Simulationszeit gemessen in MC-Schritten gemeint). Zur Berechnung derselben wird die Autokorrelationsfunktion betrachtet:
 
 \begin{equation}
 \Theta_A(t)=\frac{\langle A(\sigma_{i+t})\cdot A(\sigma_i)\rangle-\langle A\rangle^2}{\langle A^2\rangle-\langle A\rangle^2}
 \label{eq:Autokorrelationsfunktion}
 \end{equation}
 
-betrachtet. Hierbei läuft die Mittelwertbildung mit der Variable $i$ über die gesamte ausgewertete Simulationszeit $\widetilde{M}$. $\Theta_A$ ist in solch einer Weise normiert, dass $\Theta_A(0)=1$ und $\Theta_A(t\rightarrow\infty)=0$. Die Autokorrelationsfunktion hängt sodann mit der Autokorrelationszeit negativ exponentiell zusammen,
+Hierbei läuft die Mittelwertbildung mit der Variable $i$ über die gesamte ausgewertete Simulationszeit $R_1$. $\Theta_A$ ist in solch einer Weise normiert, dass $\Theta_A(0)=1$ und $\Theta_A(t\rightarrow\infty)=0$. Die Autokorrelationsfunktion hängt dabei negativ exponentiell mit der Autokorrelationszeit zusammen:
 
 \begin{equation}
-\Theta_A(t)\sim e^{-t/\tau_A}\ \mathrm{.}
+\Theta_A(t)\sim e^{-t/\tau_A}
 \label{eq:Autokorrelationszeit}
 \end{equation}
 
-Nachdem $\tau_A$ auf diese Art ermittelt wurde, können die Messwerte in Gruppen mit der Länge $3\cdot\tau_A$ gebündelt und unabhängige Gruppenmittelwerte
+Nachdem $\tau_A$ auf diese Art ermittelt wurde, können die Messwerte in Gruppen mit z.B. der Länge $3\cdot\tau_A$ \cite{Buch} gebündelt und unabhängige Gruppenmittelwerte
 
 \begin{equation}
 \overline{A}_b=\frac{1}{3\tau_A}\sum_{i=0}^{3\tau_A - 1}A(\sigma_{b\cdot\tau_a+i})
 \label{eq:Gruppenmittelwert}
 \end{equation}
 
-berechnet werden, wobei $b$ hier der Gruppen-Index ist und die Anzahl der Gruppen
+berechnet werden, wobei $b$ hier der Gruppen-Index ist und die Anzahl der Gruppen:
 
 \begin{equation}
-B=\left\lfloor\frac{\widetilde{M}}{3\tau_A}\right\rfloor\ \mathrm{.}
+B=\left\lfloor\frac{R_1}{3\tau_A}\right\rfloor
 \label{eq:Gruppenanzahl}
 \end{equation}
 
-Nach dem zentralen Grenzwert Satz folgen diese Gruppenmittelwerte sodann einer Gauß-Vertei\-lung, deren Erwartungswert der exakte Wert
+Nach dem {\itshape Zentralen Grenzwert-Satz} folgen diese Gruppenmittelwerte sodann einer Gauß-Vertei\-lung, deren Erwartungswert dann der angestrebte {\bfseries Mittelwert} ist:
 
 \begin{equation}
 \overline{A}=\frac{1}{B}\sum_{b=0}^{B-1}\overline{A}_b
 \label{eq:Exakt}
 \end{equation}
 
-ist. Als Fehler kann die Standardabweichung, also 
+Zur Abschätzung des Fehlers wird immer die Standardabweichung mit ausgewertet: 
 
 \begin{equation}
 \sigma_A=\sqrt{\frac{1}{B(B-1)}\sum_{b=0}^{B-1}(\overline{A}_b-\overline{A})^2}
 \label{eq:Fehler}
 \end{equation}
-
-angegeben werden.
