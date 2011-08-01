@@ -1,0 +1,35 @@
+\select@language {ngerman}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Mittelwerte der Energie und W\"armekapazit\"at; {\itshape Quelle:} Eigenwerk}}{17}{figure.caption.5}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\bfseries Mittelwerte der Energie}}}{17}{subfigure.3.1.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\bfseries Mittelwerte der W\"armekapazit\"at}}}{17}{subfigure.3.1.2}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Autokorrelationszeiten der Energie; {\itshape Quelle:} Eigenwerk}}{19}{figure.caption.7}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Mittlere Magnetisierung und magnetische Suszeptibilit\"at; {\itshape Quelle:} Eigenwerk}}{20}{figure.caption.8}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\bfseries Mittelwerte der Magnetisierung}}}{20}{subfigure.3.3.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\bfseries Mittelwerte der mag. Suszeptibilit\"at}}}{20}{subfigure.3.3.2}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Mittlere abs. Magnetisierung und mag. Suszeptibilit\"at; {\itshape Quelle:} Eigenwerk}}{20}{figure.caption.9}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\bfseries Mittelwerte der abs. Magnetisierung}}}{20}{subfigure.3.4.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\bfseries Mittelwerte der abs. mag. Suszeptibilit\"at}}}{20}{subfigure.3.4.2}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Visualisierung des Operatorstrings; {\itshape Quelle:} \cite {Sandvik}}}{25}{figure.caption.10}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces M\"ogl. Probleme beim Off-Diagiagonalen Loop Update; {\itshape Quelle:} \cite {Sandvik}}}{26}{figure.caption.13}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\bfseries Problematischer (gestrichelt) und Unproblematischer Fall (durchgezogen)}}}{26}{subfigure.4.2.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\bfseries Ausweg \"uber die Modifikation des Anfangszustand}}}{26}{subfigure.4.2.2}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Loop im Operatorstring; {\itshape Quelle:} \cite {Sandvik}}}{27}{figure.caption.14}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\bfseries Operatorstring mit eingezeichneter Loop}}}{27}{subfigure.4.3.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\bfseries Operatorstring nach dem Flippen der Loop}}}{27}{subfigure.4.3.2}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces M\"ogliche Verwendung der Operatoren mit den Vertex-Typnummern; {\itshape Quelle:} \cite {Sandvik}}}{30}{figure.caption.20}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Mittelwerte der Energie und W\"armekapazit\"at; {\itshape Quelle:} Eigenwerk}}{32}{figure.caption.22}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\bfseries Mittelwerte der Energie}}}{32}{subfigure.4.5.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\bfseries Mittelwerte der W\"armekapazit\"at}}}{32}{subfigure.4.5.2}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Absoluter Fehler der Energie; {\itshape Quelle:} Eigenwerk}}{32}{figure.caption.23}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Mittelwerte der Energie und W\"armekapazit\"at; {\itshape Quelle:} Eigenwerk}}{34}{figure.caption.24}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\bfseries Mittelwerte der Energie}}}{34}{subfigure.4.7.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\bfseries Mittelwerte der W\"armekapazit\"at}}}{34}{subfigure.4.7.2}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Mittelwerte der Energie und W\"armekapazit\"at; {\itshape Quelle:} Eigenwerk}}{34}{figure.caption.25}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\bfseries Mittelwerte der Energie}}}{34}{subfigure.4.8.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\bfseries Mittelwerte der W\"armekapazit\"at}}}{34}{subfigure.4.8.2}
+\addvspace {10\p@ }
+\addvspace {10\p@ }

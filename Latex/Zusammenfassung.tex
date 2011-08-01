@@ -2,3 +2,9 @@
 \thispagestyle{empty}
 \cleardoublepage
 \chapter{Zusammenfassung}
+
+Die {\bfseries Stochastic Series Expansion} stellt ein mächtiges Werkzeug für das Sampling von Operatorstrings innerhalb eines quantenmechanischen Lösungsansatzes dar. Sie ist für größere 2-dimensionale Systeme der schnellste Weg, um die typischen, thermodynamischen Größen zu messen und wird hierfür an mehreren Instituten erfolgreich eingesetzt. Der Algorithmus ist relativ leicht zu implementieren und arbeitet äußerst speichersparend.
+
+Im Rahmen dieser Arbeit wurde ein Simulationsprogramm geschrieben, welches nicht nur ein bloßes SSE Modul enthält, sondern die Möglichkeit anbietet, die SSE-Daten für kleine Systeme mit ED {\bfseries Exakt Diagonalisation} zu überprüfen, als auch ein Zusatzmodul für das numerische Lösen des klassischen Ising-Modells enthält. Nach einem Baukasten Prinzip wurden Klassendateien für verschiedene Szenarien hinzugefügt. So ist die Analyse der Daten in einzelne Pakete gekapselt, um ein Höchstmaß an Flexibilität zu garantieren. Das Messen einer Größe kann also einfach ein- und ausgeschaltet werden. Weiterhin bietet die Anwendung verschiedene Geometriemodelle an, aus denen das gewünschte gewählt werden kann (Periodische Gitter und Offene und Periodische Ketten). Natürlich ist es ohne Weiteres möglich einfach weitere Features hinzuzufügen!
+
+Die durchgeführten Messungen bestätig die Theorie und liefern sehr genaue Ergebnisse. Über den Parameter "`measureCount"' kann die Anzahl der durchzuführenden Messungen modifiziert werden. So ist eine Entscheidung zwischen benötigter Rechenzeit und Genauigkeit möglich.
