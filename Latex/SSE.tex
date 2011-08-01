@@ -1,33 +1,37 @@
+\newpage
+\thispagestyle{empty}
+\cleardoublepage
 \chapter[Quantenmechanische MCS mit Hilfe der Stochastic Series Expansion]{Quantenmechanische MCS\\\LARGE mit Hilfe der Stochastic Series Expansion}
+\label{sec:SSE}
 
-Im Folgenden wollen wir uns nun der Simulation des quantenmechanischen Spin-1/2 Heisenberg Systems zuwenden. Die verwendete Methode {\itshape Stochastic Series Expansion} hat ihren Ursprung in der 1962 vorgestellten Reihenentwicklung von D.C Handscomb \cite{Handscomb}, welche seit 1991 besonders von Anders W. Sandvik, Olaf F. Sylju\aa sen und Juhani Kurkijärvi weiterentwickelt wurde \cite{Diplom}.
+Im Folgenden wollen wir uns nun der Simulation des quantenmechanischen Spin-1/2 Heisenberg Systems mithilfe der SSE nach \cite{Buch} und \cite{Sandvik} zuwenden. 
 
-Unsere Beispielapplikation wird für verschiedene Systeme wie {\itshape Offene Kette} oder {\itshape Periodisches Gitter} die Energie und die Wärmekapazität berechnen, wobei wir sämtliche Daten immer im Vergleich zur Exakten Diagonalisierung des Hamiltonoperators betrachten und einordnen wollen.
+Unsere Beispielapplikation berechnet für verschiedene Systeme ({\itshape Offene Kette}, {\itshape Periodische Kette} und {\itshape Periodisches Gitter}) die Energie und die Wärmekapazität, wobei wir sämtliche Daten immer entweder im Vergleich zur {\itshape Exakten Diagonalisierung} des Hamiltonoperators oder entsprechenden Literaturwerten betrachten und einordnen.
 
 \section{Methode}
 
 \subsection{Das Spin-1/2 Heisenberg System}
 
-Der Hamiltonian des Spin-1/2 Heisenberg Systems mit Zeemann-Term ist gegeben durch
+Der Hamiltonian des Spin-1/2 Heisenberg Systems mit Zeemann-Term ist gegeben durch:
 
 \begin{equation}
-H_{\mathrm{Heisenberg}}=\sum_{\left\langle i,j\right\rangle}J_{ij}\cdot\left(S_i^xS_j^x+S_i^yS_j^y+\Delta S_i^zS_j^z\right)-h\sum_{i=0}^{N-1}\mu_{i}\cdot S_i^z\ \mathrm{.}
+H_{\mathrm{Heisenberg}}=\sum_{\left\langle i,j\right\rangle}J_{ij}\cdot\left(S_i^xS_j^x+S_i^yS_j^y+\Delta S_i^zS_j^z\right)-h\sum_{i=0}^{N-1}\mu_{i}\cdot S_i^z
 \label{eq:HeisenbergHamiltonian}
 \end{equation}
 
-Man betrachtet also eine 3-dimensionale Koppelung von benachbarten Spins (gewichtet in $Z$-Richtung) mit der Bindungsmatrix $\boldsymbol{J}$ an der zusätzlich ein externes Magnetfeld $\boldsymbol{h}=(0,0,h)^T$ angreift. Das Magnetische Moment ist mit $\boldsymbol{\mu}=(0,0,\mu)^T$ benannt.
+Man betrachtet also eine magnetische Koppelung von 3-dimensionalen, benachbarten Spins (abweichend in $Z$-Richtung um den Faktor $\Delta$) mit der Bindungsmatrix $\boldsymbol{J}$, an denen zusätzlich ein externes Magnetfeld $\boldsymbol{h}=(0,0,h)^T$ angreift. Das magnetische Moment sei mit $\boldsymbol{\mu}=(0,0,\mu)^T$ benannt.
 
-Das Heisenberg System wird folgendermaßen nach $\Delta$ klassifiziert:
+Das Heisenberg System wird folgendermaßen durch das $\Delta$ klassifiziert:
 
 \begin{itemize}
 \item $\Delta<-1$: Ising-Phase
 \item $\Delta=-1$: Isotrope ferromagnetische Phase
-\item $\vert\Delta\vert=1$: XY-Phase
+\item $\vert\Delta\vert<1$: XY-Phase
 \item $\Delta=1$: Isotrope antiferromagnetische Phase
 \item $\Delta>1$: N\'eel-Phase
 \end{itemize}
 
-Wir wollen uns hier speziell mit der isotropen antiferromagnetischen Phase beschäftigen, wobei wir auch hier wieder jedes $J_{ij}=1$ sowie $\mu_i=1$ setzen wollen. Die Anordnung betrachten wir weiterhin ohne Magnetfeld ($h=0$). Daraus ergiebt sich der vereinfachte Hamiltonian
+Wir wollen uns hier speziell mit der isotropen antiferromagnetischen Phase beschäftigen, wobei wir auch hier wieder alle $J_{ij}=1$ sowie $\mu_i=1$ setzen wollen (Homogenität). Die Anordnung betrachten wir weiterhin ohne Magnetfeld ($h=0$). Daraus ergibt sich der vereinfachte Hamiltonian
 
 \begin{equation}
 H=\sum_{\left\langle i,j\right\rangle}S_i^xS_j^x+S_i^yS_j^y+S_i^zS_j^z=\sum_{\left\langle i,j\right\rangle}\boldsymbol{S}_i\cdot\boldsymbol{S}_j
@@ -41,18 +45,18 @@ H=\sum_{b=1}^{N_b}\frac{1}{2}\left(S_{i(b)}^+S_{j(b)}^-+S_{i(b)}^-S_{j(b)}^+\rig
 \label{eq:BeispielHeisenbergHamiltonianPM}
 \end{equation}
 
-umformen kann, wobei wir die Pärchen $\left\langle i,j\right\rangle$ durchnummeriert haben und für die Spin-Indices Nachbar-Funktionen $i(b)$ und $j(b)$ verwenden. Diese ergeben sich aus der Systembeschaffenheit. Betrachtet man die Spin Operatoren dann in der Standardbasis bezüglich $S^z$, so kann man den Hamiltonian pro Koppelung (engl. Bond) in einen diagonalen $H_{0,b}$ und einen off-diagonalen Teil $H_{1,b}$ aufspalten,
+umformen kann, wobei wir die Pärchen $\left\langle i,j\right\rangle$ mit einem Index $b$ durchnummerieren und für die Spin-Indizes Nachbar-Funktionen $i(b)$ und $j(b)$ einführen; diese ergeben sich aus der Geometrie des Systems. Betrachtet man die Spin Operatoren dann in der Standardbasis bezüglich $S^z$, so kann man den Hamiltonian pro Koppelung (engl. Bond) in einen diagonalen $H_{0,b}$ und einen off-diagonalen Teil $H_{1,b}$ aufspalten:
 
 \begin{equation}
-H=-\sum_{b=1}^{N_b}\left(\underbrace{\frac{1}{4}-S_{i(b)}^zS_{j(b)}^z}_{H_{0,b}}-\underbrace{\frac{1}{2}\left(S_{i(b)}^+S_{j(b)}^-+S_{i(b)}^-S_{j(b)}^+\right)}_{H_{1,b}}\right) + \left\{\frac{N_b}{4}\right\}\ \mathrm{.}
+H=-\sum_{b=1}^{N_b}\left(\underbrace{\frac{1}{4}-S_{i(b)}^zS_{j(b)}^z}_{H_{0,b}}-\underbrace{\frac{1}{2}\left(S_{i(b)}^+S_{j(b)}^-+S_{i(b)}^-S_{j(b)}^+\right)}_{H_{1,b}}\right) + \left\{\frac{N_b}{4}\right\}
 \label{eq:BeispielHeisenbergHamiltonianTeile}
 \end{equation}
 
-Aus einem bald ersichtlichen Grund führen wir darüber hinaus eine Konstante $1/4$ ein, welche wir der Energie am Schluss wieder hinzufügen werden.
+Hierbei fügen wir $H_{0,b}$ eine zusätzliche Konstante $1/4$ ein, um die Eigenwerte des Produktoperators $-S_{i(b)}^zS_{j(b)}^z$ von $\pm1/4$ auf $\{0,\;1/2\}$, was für spätere Berechnungen bequemer ist.
 
 \subsection{Reihenentwicklung}
 
-Wie beim klassischen Ising Modell im Abschnitt \ref{sec:KanonischeUebergangswahrscheinlichkeiten} versuchen wir nun auch, die Zustandssumme einfacher zu erhalten, als den gesamten Zustandsraum abtasten zu müssen. Der obere Ansatz ist hier jedoch nicht hilfreich, weil wir die Energie bzw. den Hamiltonian für den Boltzmannfaktor (in der Zustandssumme) nicht berechnen können. Deshalb schlagen wir einen anderen Weg ein:
+Wie beim klassischen Ising Modell im Abschnitt \ref{sec:KlassischesSampling} versuchen wir nun auch, die Zustandssumme durch einen Monte-Carlo Ansatz anzunähern, anstatt den gesamten Zustandsraum abtasten zu müssen. Der obere Ansatz ist hier jedoch nicht hilfreich, weil wir die Energie bzw. den Hamiltonian für den Boltzmannfaktor (in der Zustandssumme) nicht berechnen können. Deshalb schlagen wir einen anderen Weg ein:
 
 Die quantenmechanische Zustandssumme
 
@@ -61,7 +65,7 @@ Z=\tr e^{-\beta H}
 \label{eq:QuantenmechanischeZustandssumme}
 \end{equation}
 
-ist über Spur der "`Boltzmannmartix"' definiert. Schreiben wir die Spur mit der Basis $\vert\alpha\rangle$ und verwenden für die Exponentialfunktion die Reihendarstellung, ergibt sich
+ist über Spur des "`Boltzmann-Operators"' definiert. Schreiben wir die Spur mit der Basis $\vert\alpha\rangle$ und verwenden für die Exponentialfunktion die Reihendarstellung, ergibt sich
 
 \begin{align}
 Z&=\sum_{n=0}^\infty\frac{(-\beta)^n}{n!}\sum_\alpha\langle\alpha\mid H^n\mid\alpha\rangle\label{eq:QuantenmechanischeZustandssummeReihe}\\
@@ -70,16 +74,14 @@ Z&=\sum_{n=0}^\infty\frac{(-\beta)^n}{n!}\sum_\alpha\langle\alpha\mid H^n\mid\al
 
 wobei wir die obige Gl. \ref{eq:BeispielHeisenbergHamiltonianTeile} für den Hamiltonian einsetzen.
 
-An dieser Stelle führen wir die Potenzierung der Hamiltonians explizit aus und erhalten dadurch $n$-lange Hamiltonoperatorketten, sogenannte Operatorstrings. Jedes Kettenglied ist hierbei entweder diagonal oder off-diagonal und gehört zu einer bestimmten Koppelung $b$. Da jede mögliche Kombination von $n$ Operatoren vorkommt, haben wir insgesamt $(2N_b)^n$ Operatorstrings. Um diese geeignet zu verwalten, definieren wir die Menge aller $n$-langen Operatorstrings $\{S_n\}$ und ordnen jedem String je eine Funktion für die beiden Indizes $a(p)\in\{0,1\}$ und $b(p)\in\{1,\ldots,N_b\}$ der Hamiltonoperatoren zu, wobei $p$ die Position im String darstellt. Darüber hinaus hebt sich das erste Minuszeichen vor der Summe mit dem vor dem $\beta$ weg, das Minuszeichen zwischen den Hamiltonoperatoren ziehen wir mit der Anzahl der off-diagonalen Operatoren $n_1$ vor das Matrixelement:
+An dieser Stelle führen wir die Potenzierung der Hamiltonians explizit durch Ausmultiplizieren aus und erhalten dadurch Hamiltonoperatorketten der Länge $n$, sogenannte Operatorstrings. Jedes Kettenglied ist hierbei entweder diagonal oder off-diagonal und gehört zu einer bestimmten Koppelung $\langle i,j\rangle$ mit Index $b$. Da jede mögliche Kombination von $n$ Operatoren vorkommt, haben wir insgesamt $(2N_b)^n$ Operatorstrings. Um diese geeignet zu verwalten, definieren wir die Menge aller Operatorstrings der Länge $n$ als $\{S_n\}$ und ordnen jedem String je eine Funktion für die beiden Indizes $a(p)\in\{0,1\}$ und $b(p)\in\{1,\ldots,N_b\}$ der Hamiltonoperatoren zu, welche den exakten Operator $H_{a(p),b(p)}$ an der Position $p$ im String darstellen. Darüber hinaus hebt sich das erste Minuszeichen vor der Summe mit dem vor dem $\beta$ weg und das Minuszeichen zwischen den Hamiltonoperatoren ziehen wir mit der Anzahl der off-diagonalen Operatoren $n_1$ vor das Matrixelement:
 
 \begin{equation}
 Z=\sum_{n=0}^\infty\frac{\beta^n}{n!}\sum_\alpha\sum_{\{S_n\}}(-1)^{n_1}\langle\alpha\mid\prod_{p=0}^{n-1}H_{a(p),b(p)}\mid\alpha\rangle
 \label{eq:QuantenmechanischeZustandssummeStrings}
 \end{equation}
 
-$S_n$ bestimmt also durch $a(p)$ und $b(p)$ die Zuordnung der Indizes auf den $p$-ten Operator.
-
-Nun betrachten wir noch die unendliche Summe über $n$. Diese schneiden wir bei $n=L$ ab (eine Fehlerrechnung folgt später) und bringen alle Operatorstrings mit $n<L$ auf die Länge $L$, indem wir $L-n$ Einheitsmatrizen in sie einfügen, die wir sinnvollerweise $H_{0,0}$ nennen. Dies führt zu nur noch {\bfseries einer} Menge von Operatorstrings $S_L$, in die die kürzeren integriert wurden. Da es aber $\binom{L}{n}$ Möglichkeiten gibt die Einheitsmatrizen einzufügen, müssen wir hierdurch teilen, da ein ehemaliger $S_n$ Operatorstring auch zukünftig nur einfach in die Zustandssumme eingehen soll:
+Nun betrachten wir noch die unendliche Summe über $n$. Diese schneiden wir bei $n=L$ ab (eine Fehlerrechnung folgt später) und bringen alle Operatorstrings mit $n<L$ auf die Länge $L$, indem wir $L-n$ Einheitsmatrizen in sie einfügen, die wir sinnvollerweise $H_{0,0}$ nennen. Dies führt zu nur noch {\bfseries einer} Menge von Operatorstrings $S_L$, in die die kürzeren integriert wurden. Da es aber $\binom{L}{n}$ Möglichkeiten gibt die Einheitsmatrizen einzufügen, müssen wir zusätzlich durch diese Vielfachheit teilen, da ein ehemaliger $S_n$ Operatorstring auch zukünftig nur einfach in die Zustandssumme eingehen soll:
 
 \begin{equation}
 Z=\sum_{\{S_L\}}\frac{\beta^{n}(-1)^{n_1}(L-n)!}{L!}\sum_\alpha\langle\alpha\mid\prod_{p=0}^{L-1}H_{a(p),b(p)}\mid\alpha\rangle
@@ -88,7 +90,7 @@ Z=\sum_{\{S_L\}}\frac{\beta^{n}(-1)^{n_1}(L-n)!}{L!}\sum_\alpha\langle\alpha\mid
 
 $n$ ist nun nicht mehr die Stringlänge, sondern die Anzahl der Operatoren ungleich $H_{0,0}$.
 
-Wir wollen uns nun die Wirkung des Operatorstrings auf die Basis $\vert\alpha\rangle$ ansehen: Diese {\itshape propagierten Zustände}
+Wir wollen nun die Wirkung des Operatorstrings auf die Basis $\vert\alpha\rangle$ betrachten: Diese {\itshape propagierten Zustände}
 
 \begin{equation}
 \vert\alpha(Q)\rangle=\prod_{p=0}^{Q-1}H_{a(p),b(p)}\mid\alpha\rangle
@@ -113,23 +115,23 @@ H_{1,b}\mid\ldots\downarrow_{i(b)}\ldots\downarrow_{j(b)}\ldots\rangle&=\frac{1}
 \langle\ldots\uparrow_{i(b)}\ldots\downarrow_{j(b)}\ldots\mid H_{0,b}\mid\ldots\downarrow_{i(b)}\ldots\uparrow_{j(b)}\ldots\rangle&=\frac{1}{2}\ \mathrm{.}\label{eq:OffDigonalOpAuf01}
 \end{align}
 
-Dieser Sachverhalt vereinfacht den Algorithmus deutlich. Beim Sampling später tragen also nur Operatorstrings bei, deren Operatoren auf nicht-parallele Spins wirken. Das Matrixelement einer solchen Operation ist außerdem immer $\frac{1}{2}$. Dies war der Grund für die Konstante $\frac{1}{4}$ in $H_{0,b}$ aus Gl. \ref{eq:BeispielHeisenbergHamiltonianTeile}.
+Dieser Sachverhalt vereinfacht den Algorithmus deutlich. Beim späteren Sampling tragen also nur solche Operatorstrings bei, deren Operatoren auf nicht-parallele Spins wirken. Das Matrixelement einer solchen Operation ist außerdem immer $\frac{1}{2}$ (dies war der Grund für die Konstante $1/4$ in $H_{0,b}$ aus Gl. \ref{eq:BeispielHeisenbergHamiltonianTeile}).
 
 Das Gewicht für eine beitragende Konfiguration $\sigma$ ist also
 
 \begin{equation}
-W(\sigma,S_L)=\left(\frac{\beta}{2}\right)^n\frac{(L-n)!}{L!}
+p(\sigma,S_L)=\left(\frac{\beta}{2}\right)^n\frac{(L-n)!}{L!}
 \label{eq:HeisenbergGewichte}
 \end{equation}
 
-wobei wir verwenden, dass $n_1$ auf Quadratgittern und Ketten immer gerade ist und deshalb wegfällt.
+wobei wir verwenden, dass $n_1$ auf Quadratgittern und Ketten immer gerade ist und deshalb wegfällt \cite{Sandvik}.
 
 \subsection{Sampling}
 
-Zu Beginn der Simulation gehen wir von einem leeren Operatorstring und einer zufälligen Spinanordnung aus und führen wie in Kapitel \ref{sec:Ising} MC-Schritte aus. Diese sind unterteilt in ein Diagonal Update, welches diagonale Operatoren in den String ein- und ausbaut und in ein off-diagonales Loop Update, welches diagonale zu off-diagonale Operatoren hin- und zurücktransformiert. Jedes Update muss allerdings darauf achten, dass die oben angegeben Beschränkungen nicht verletzt werden:
+Wir wenden nun die {\bfseries Monte-Carlo Methode} auf Operatorstrings anstatt Zuständen an: Zu Beginn der Simulation gehen wir von einem leeren Operatorstring und einer zufälligen Spinanordnung aus und führen wie in Kapitel \ref{sec:Ising} MC-Schritte aus. Diese sind unterteilt in ein Diagonal Update, welches diagonale Operatoren in den String ein- und ausbaut und in ein so genanntes off-diagonales Loop Update, welches diagonale zu off-diagonale Operatoren hin- und zurücktransformiert. Jedes Update muss allerdings darauf achten, dass die oben angegeben Beschränkungen nicht verletzt werden:
 
 \begin{itemize}
-\item Operatoren dürfen nicht auf parallele Spin-Paare wirken, ansonsten zerstören sie den Zustand (Lokale Bedingung).
+\item Operatoren dürfen nicht auf parallele Spin-Paare wirken, ansonsten annihilieren sie den Zustand (lokale Bedingung).
 \item Die Periodizität $\vert\alpha\rangle=\vert\alpha(0)\rangle=\vert\alpha(L)\rangle$ des Algorithmus' muss gewahrt werden.
 \end{itemize}
 
@@ -138,71 +140,67 @@ Das Sampling kann durch Graphiken wie \ref{fig:OffDiagonalNormal} veranschaulich
 \begin{figure}[thb]
   \centering
   \includegraphics[width=0.3\textwidth]{Bilder/Off-Diagonal-Normal} 
-  \caption[Visualisierung des Operatorstrings]{{\bfseries Visualisierung des Operatorstrings:} die Kreise ganz unten und ganz oben stellen die Spinkonfiguration $\vert\alpha(0)\rangle$ bzw. $\vert\alpha(L)\rangle$ dar. Dazwischen liegen diagonale Operatoren (weiß) und off-diagonale (schwarz). Reihen ohne Operatoren signalisieren einen $H_{0,0}$ Operator. Quelle: \cite{Sandvik}}
+  \caption[Visualisierung des Operatorstrings; {\itshape Quelle:} \cite{Sandvik}]{{\bfseries Visualisierung des Operatorstrings:} Die Kreise ganz unten und ganz oben stellen die Spinkonfiguration $\vert\alpha(0)\rangle$ bzw. $\vert\alpha(L)\rangle$ dar. Dazwischen liegen diagonale (weiß) und off-diagonale Operatoren (schwarz). Reihen ohne Operatoren signalisieren einen $H_{0,0}$ Operator; {\itshape Quelle:} \cite{Sandvik}}
   \label{fig:OffDiagonalNormal}
 \end{figure}
 
 \subsubsection{Diagonales Update}
 
-Für das Einfügen von diagonalen Operatoren in den String, muss darauf geachtet werden, dass dieser nicht an parallele Spins angelegt wird. Die Periodizität wird durch die Aktion nicht gestört, da diagonale Operatoren den Zustand nicht verändern. Für das Entfernen von diagonalen Operatoren aus dem Operatorstring ist nicht einmal die erste Bedingung problematisch.
+Für das Einfügen von diagonalen Operatoren in den String muss darauf geachtet werden, dass dieser nicht an parallele Spins angelegt wird. Die Periodizität hingegen wird durch die Aktion nicht gestört, da diagonale Operatoren den Zustand nicht verändern. Das Entfernen von diagonalen Operatoren aus dem Operatorstring ist generell unproblematisch.
 
-Die Wahrscheinlichkeit für das Einfügen eines Operators an einem Platz $p$ gibt man analog zur Gl. \ref{eq:Metropolis} mit
+Wir legen nun unsere Übergangswahrscheinlichkeiten $\boldsymbol{W}$ für das Einfügen eines Operators an einem Platz $p$ gemäß des {\bfseries Metropolis Algorithmus'} fest (Gl. \ref{eq:Metropolis}):
 
 \begin{equation}
 W_{\nu\sigma,\ \mathrm{Einf"ugen}}=\begin{cases}
-\frac{W(\sigma,S_L)\cdot N_b}{W(\nu,S_L)}=\frac{\beta N_b}{2(L-n)} & W(\sigma,S_L)\cdot N_b<W(\nu,S_L)\\
-1                                                                  & W(\sigma,S_L)\cdot N_b\geq W(\nu,S_L)
+\frac{p(\sigma,S_L)\cdot N_b}{p(\nu,S_L)}=\frac{\beta N_b}{2(L-n)} & p(\sigma,S_L)\cdot N_b<p(\nu,S_L)\\
+1                                                                  & p(\sigma,S_L)\cdot N_b\geq p(\nu,S_L)
 \end{cases}
 \label{eq:EinfuegeWahrscheinlichkeit}
 \end{equation}
 
-an. Analog für dies erhält man beim Löschens eines Operators (Ersetzen mit der Einheitsmatrix)
+Analog erhält man beim Löschens eines Operators (ersetzen mit der Einheitsmatrix)
 
 \begin{equation}
 W_{\nu\sigma,\ \mathrm{Entfernen}}=\begin{cases}
-\frac{W(\sigma,S_L)\cdot N_b}{W(\nu,S_L)}=\frac{2(L-n+1)}{\beta N_b} & W(\sigma,S_L)\cdot N_b<W(\nu,S_L)\\
-1                                                                    & W(\sigma,S_L)\cdot N_b\geq W(\nu,S_L)\ \mathrm{.}
+\frac{p(\sigma,S_L)\cdot N_b}{p(\nu,S_L)}=\frac{2(L-n+1)}{\beta N_b} & p(\sigma,S_L)\cdot N_b<p(\nu,S_L)\\
+1                                                                    & p(\sigma,S_L)\cdot N_b\geq p(\nu,S_L)\ \mathrm{.}
 \end{cases}
 \label{eq:EntferneWahrscheinlichkeit}
 \end{equation}
 
-Die Eigenschaft {\itshape Detailed Balance} kann hier leicht durch Einsetzen in \ref{eq:DetailedBalance} geprüft werden.
+Die Eigenschaft {\itshape Detailed Balance} kann sofort durch Einsetzen in \ref{eq:DetailedBalance} verifiziert werden.
 
-\subsubsection{Off-Diagonales Update}
+\subsubsection{Off-Diagonales Loop Update}
 
-Beim Austauschen von diagonalen und off-diagonalen Operatoren ist der Sachverhalt etwas komplizierter, denn dadurch wird eine Vertauschung von Spinausrichtungen (durch den off-diagonalen Operator) hinzugefügt bzw. entfernt. Es ist selbstverständlich, dass unter der Berücksichtigung der Periodizität also mindestens zwei off-diagonale Operatoren in solch eine Aktion involviert sein müssen. Befinden sich zwischen diesem Operator-Paar allerdings weitere Operatoren, kann es zu einer Regelverletztung der lokalen Bedingung kommen, da ein Ändern der Zustände zwischen dem Operatorpaar den dazwischen beeinflusst (s. Abb. \ref{fig:Off-Diagonal-Works}). In Abb. \ref{fig:Off-Diagonal-NeedsLoop} wird eine mögliche Lösung dieses Problems dargestellt, hier wird nicht der Zustand zwischen dem Operatorenpaar verändert, sondern der außerhalb (inklusive dem Anfangs- und Endzustand).
+Beim Austausch von diagonalen und off-diagonalen Operatoren ist der Sachverhalt etwas komplizierter, denn dadurch wird ein Vertauschen von Spinrichtungen (durch den off-diagonalen Operator) hinzugefügt bzw. entfernt. Es ist selbstverständlich, dass unter der Berücksichtigung der Periodizität also mindestens zwei off-diagonale Operatoren in solch eine Aktion involviert sein müssen. Befinden sich zwischen diesem Operator-Paar allerdings weitere Operatoren, kann es zu einer Regelverletztung der lokalen Bedingung kommen, da ein Ändern der Zustände zwischen dem Operatorpaar den dazwischen liegenden beeinflusst (siehe Abb. \ref{fig:Off-Diagonal-Works}). In Abb. \ref{fig:Off-Diagonal-NeedsLoop} wird eine mögliche Lösung dieses Problems dargestellt; hierbei wird nicht der Zustand zwischen dem Operatorenpaar verändert, sondern der außerhalb (inklusive dem Anfangs- und Endzustand).
 
 \begin{figure}[thb]
   \centering
   \subfloat[{\bfseries Problematischer (gestrichelt) und Unproblematischer Fall (durchgezogen)}]{
     \label{fig:Off-Diagonal-Works}
-    \includegraphics[width=0.48\textwidth]{Bilder/Off-Diagonal-Works} 
-  }
-  \quad
-  \quad
+    \includegraphics[width=0.41\textwidth]{Bilder/Off-Diagonal-Works} 
+  }\quad\quad
   \subfloat[{\bfseries Ausweg über die Modifikation des Anfangszustand}]{
     \label{fig:Off-Diagonal-NeedsLoop}
-    \includegraphics[width=0.48\textwidth]{Bilder/Off-Diagonal-NeedsLoop} 
+    \includegraphics[width=0.41\textwidth]{Bilder/Off-Diagonal-NeedsLoop} 
   }
-  \caption[Darstellung mög. Probleme bzgl. verletzter Bedingungen beim Off-Diag. Update]{Darstellung möglicher Probleme bzgl. verletzter Bedingungen beim Off-Diagonalen Update. In (a) sehen wir wie das durchgezogen marktierte Update unproblematisch durchgeführt, wobei das gestrichelte Update den Operator zwischen dem Paar so beeinflussen würde, dass dieser die lokale Bedingung nicht mehr erfüllt. In (b) sehen wir einen möglichen Ausweg, da hier Zustände zwischen den Operatoren nicht geändert werden, sondern der Anfangs- bzw. Endzustand. Quelle: \cite{Sandvik}}
+  \caption[Mögl. Probleme bzgl. verletzter Bedingungen beim Off-Diag. Loop Update; {\itshape Quelle:} \cite{Sandvik}]{Mögliche Probleme bzgl. verletzte Bedingungen beim Off-Diagonalen Update. In (a) sehen wir, wie das durchgezogen marktierte Update unproblematisch durchgeführt, wobei das gestrichelte Update den Operator zwischen dem Paar so beeinflussen würde, dass dieser die lokale Bedingung nicht mehr erfüllt. In (b) sehen wir einen möglichen Ausweg, da hier Zustände zwischen den Operatoren nicht geändert werden, sondern der Anfangs- bzw. Endzustand; {\itshape Quelle:} \cite{Sandvik}}
   \label{fig:ProblematikVonOffDiagonalUpdates}
 \end{figure}
 
-Eine andere Möglichkeit wäre natürlich, den zweiten (links) anliegenden Spin des involvierten mittleren Operators auch zu ändern, sodass die lokale Bedingung wieder erfüllt ist. Dies beeinflusst aber wieder andere Operatoren, etc.. Im Endeffekt versucht man also alle sogennanten Loops (s. Abb. \ref{fig:Off-Diagonal-Loop}), abgeschlossene Wege durch den Operatorstring, zu finden, da man diese dann wie in Abb. \ref{fig:Off-Diagonal-LoopDone} unabhängig von einander flippen kann (Loop Update), wobei Operatoren die ganz in der Loop liegen hin- und sogleich wieder zurückgeflippt werden. Der Ausweg von Abb. \ref{fig:Off-Diagonal-NeedsLoop} ist in dieser Lösung inbegriffen, da Loops auch über den periodischen Rand hinaus führen können.
+Eine andere Möglichkeit wäre natürlich, den zweiten (links) anliegenden Spin des involvierten mittleren Operators auch zu ändern, sodass die lokale Bedingung insgesamt wieder erfüllt ist. Dies beeinflusst aber wieder andere Operatoren, etc.. Im Endeffekt versucht man also, alle sogenannten Loops (siehe Abb. \ref{fig:Off-Diagonal-Loop}), d.h. abgeschlossene Wege durch den Operatorstring, zu finden, da man diese dann wie in Abb. \ref{fig:Off-Diagonal-LoopDone} unabhängig von einander flippen kann (Loop Update), wobei Operatoren die ganz in der Loop liegen hin- und sogleich wieder zurückgeflippt werden. Der Ausweg in Abb. \ref{fig:Off-Diagonal-NeedsLoop} ist in dieser Lösung inbegriffen, da Loops auch über den periodischen Rand hinaus führen können.
 
 \begin{figure}[thb]
   \centering
   \subfloat[{\bfseries Operatorstring mit eingezeichneter Loop}]{
     \label{fig:Off-Diagonal-Loop}
     \includegraphics[width=0.3\textwidth]{Bilder/Off-Diagonal-Loop} 
-  }
-  \quad
-  \quad
-  \subfloat[{\bfseries Operatorstring nach dem Flip der Loop}]{
+  }\quad\quad
+  \subfloat[{\bfseries Operatorstring nach dem Flippen der Loop}]{
     \label{fig:Off-Diagonal-LoopDone}
     \includegraphics[width=0.3\textwidth]{Bilder/Off-Diagonal-LoopDone} 
   }
-  \caption[Darstellung einer Loop im Operatorstring]{Darstellung einer Loop im Operatorstring. (a) bezieht sich noch auf den Ausgangszustand, (b) ergiebt sich nach dem flippen der in (a) angegeben Loop. Operatoren derer beider Seiten am selben Loop liegen werden nicht geflippt (hin und wieder zurückgeflippt). Quelle: \cite{Sandvik}}
+  \caption[Loop im Operatorstring; {\itshape Quelle:} \cite{Sandvik}]{Loop im Operatorstring. (a) bezieht sich noch auf den Ausgangszustand, (b) ergiebt sich nach dem flippen der in (a) angegeben Loop. Operatoren derer beider Seiten am selben Loop liegen werden nicht geflippt (hin und wieder zurückgeflippt); {\itshape Quelle:} \cite{Sandvik}}
   \label{fig:LoesungDurchLoopUpdate}
 \end{figure}
 
@@ -217,57 +215,59 @@ Z=\sum_{n=0}^\infty\frac{(-\beta)^n}{n!}\sum_{\{\alpha\}_n}\langle\alpha_0\mid H
 \label{eq:QuantenmechanischeZustandssummeReiheAusgeschrieben}
 \end{equation}
 
-wobei in die hintere Summe $n-1$ Summen über die Basis eingefügt wurden. Sodann ergiebt sich der Mittelwert von $E/N$ mit
+wobei in die hintere Summe $n-1$ Summen über die Basis eingefügt wurden. Sodann ergiebt sich der Mittelwert von $E/N$ mit:
 
 \begin{align}
+\allowdisplaybreaks
 \frac{E}{N}&=\frac{1}{ZN}\sum_{n=0}^\infty\frac{(-\beta)^n}{n!}\sum_{\{\alpha\}_{n+1}}\langle\alpha_0\mid H\mid\alpha_n\cdots\langle\alpha_1\mid H\mid\alpha_0\rangle\label{eq:QuantenEnergie}\\
-           &=\frac{1}{ZN}\sum_{n=1}^\infty\frac{(-\beta)^n}{n!}\frac{n}{-\beta}\sum_{\{\alpha\}_n}\langle\alpha_0\mid H\mid\alpha_{n-1}\cdots\langle\alpha_1\mid H\mid\alpha_0\rangle\label{eq:QuantenEnergieSubstitution}\\
+           &=\frac{1}{ZN}\sum_{n=1}^\infty\frac{(-\beta)^n}{n!}\frac{n}{-\beta}\sum_{\{\alpha\}_n}\langle\alpha_0\mid H\mid\alpha_{n-1}\cdots\langle\alpha_1\mid H\mid\alpha_0\rangle\label{eq:QuantenEnergieSubstitution}
+           \displaybreak\\
            &=\frac{1}{ZN}\sum_{n=0}^\infty\frac{(-\beta)^n}{n!}\frac{n}{-\beta}\sum_{\{\alpha\}_n}\langle\alpha_0\mid H\mid\alpha_{n-1}\cdots\langle\alpha_1\mid H\mid\alpha_0\rangle\label{eq:QuantenEnergieMit0}\\
            &=-\frac{\langle n\rangle}{N\beta}\label{eq:QuantenEnergieMittelwert}\\
-\left(\frac{E}{N}\right)_{\mathrm{Real}}&=-\frac{\langle n\rangle}{N\beta}+\left\{\frac{N_b}{4N}\right\}\ \mathrm{.}\label{eq:QuantenEnergieMitShift}
+\left(\frac{E}{N}\right)_{\mathrm{Real}}&=-\frac{\langle n\rangle}{N\beta}+\left\{\frac{N_b}{4N}\right\}\label{eq:QuantenEnergieMitShift}
 \end{align}
 
-Für die erste Form sollte man bemerken, dass die letzte Summe nun über ein $H$ mehr läuft. Die erste Umformung substituiert $n:=n+1$, die zweite fügt den $n=0$-Term wieder ein, dies ist möglich, da er sowieso 0 ergibt. Sodann kann erkannt werden, dass es sich bei dem vorliegenden Ausdruck um den Mittelwert von $n$ handelt. Zu guter Letzt fügen wir noch die "`verlorene"' Energie-Konstante von Gl. \ref{eq:BeispielHeisenbergHamiltonianTeile} hinzu.
+Für die erste Gleichheit bemerken wir, dass die letzte Summe nun über ein $H$ mehr läuft. Diese erste Umformung substituiert $n:=n+1$, die zweite fügt den $n=0$-Term wieder ein, dies ist möglich, da er ohnehin 0 ergibt. Sodann kann erkannt werden, dass es sich bei dem vorliegenden Ausdruck um den Mittelwert von $n$ handelt. Zu guter Letzt fügen wir noch die "`verlorene"' Energie-Konstante von Gl. \ref{eq:BeispielHeisenbergHamiltonianTeile} hinzu.
 
 \subsubsection{Wärmekapazität}
 
-Die Wärmekapazität pro Spin erhält man dann über die Ableitung der mittleren Energie nach der Temperatur,
+Die Wärmekapazität pro Spin erhält man dann über die Ableitung der mittleren Energie nach der Temperatur:
 
 \begin{align}
 \frac{C}{N}&=\frac{\partial_T E}{N}\\
            &=-\frac{1}{NT}\partial_T \langle n\rangle-\frac{\langle n\rangle}{N}\label{eq:QuantenWaermeKapazitaet}\\
-           &=\frac{\langle n^2\rangle-\langle n\rangle^2-\langle n\rangle}{N}\label{eq:QuantenWaermeKapazitaetBest}\ \mathrm{.}
+           &=\frac{\langle n^2\rangle-\langle n\rangle^2-\langle n\rangle}{N}\label{eq:QuantenWaermeKapazitaetBest}
 \end{align}
 
 \subsection{Cut-Off L}
 \label{sec:cutoff}
 
-Da für $T\rightarrow\infty$ $C\rightarrow0$ sehen wir, dass $\var n=\langle n\rangle$. D.h. dass der $T$ -- $n$ Graph in beide Richtungen exponentiell abfällt. Nach \cite{Sandvik} kann für $L$ also ein genug höherer Wert als $\langle n\rangle$ verwendet (ca. $4/3\cdot\langle n\rangle$). $n$ erreicht $L$ dann praktisch nie.
+Da für $T\rightarrow\infty$ von $C\rightarrow0$ ausgegangen werden kann, sehen wir, dass $\var n=\langle n\rangle$, das heißt, der $T$ -- $n$ Graph fällt in beide Richtungen exponentiell ab. Nach \cite{Sandvik} kann für $L$ also ein hinreichend höherer Wert als $\langle n\rangle$ verwendet werden (ca. $4/3\cdot\langle n\rangle$). Dann erreicht $n$ praktisch nie $L$.
 
-Im Algorithmus muss $L$ also für jeden MC-Schritt überprüft werden und gegebenfalls angepasst werden.
+Der Algorithmus muss $L$ also für jeden MC-Schritt überprüfen und gegebenfalls anpassen.
 
 \section{Implementierung}
 
-Die Struktur der Anwendung ist auch wieder angelehnt an die Beschreibung in \cite{Sandvik}. Der Algorithmus ähnelt dem der Klassischen MCS in Abschnitt \ref{sec:KlassischeImplementierung} sehr, verwendet allerdings andere Messformeln (s. Gl. \ref{eq:QuantenEnergieMitShift} und \ref{eq:QuantenWaermeKapazitaetBest}) und einen anderen MC-Schritt, da er den Operatorstring inklusive Anfangskonfiguration samplet und nicht nur die Einzelnen Konfigurationen.
+Die Struktur der Anwendung ist ebenfalls wieder eng angelehnt an die Beschreibung in \cite{Sandvik}. Der Algorithmus ähnelt dem der klassischen MCS in Abschnitt \ref{sec:KlassischeImplementierung} deutlich, verwendet allerdings andere Messformeln (Gl. \ref{eq:QuantenEnergieMitShift} und \ref{eq:QuantenWaermeKapazitaetBest}) und einen anderen MC-Schritt, da er den Operatorstring inklusive Anfangskonfiguration sampled und nicht nur einzelne Konfigurationen.
 
 \subsection{Initialisierung}
 
-Wie bei der Klassischen MCS beötigen wir zuerst die Eingabeparameter:
+Wie bei der klassischen MCS benötigen wir zuerst die Eingabeparameter:
 
 \begin{itemize}
-\item Anzahl der Spins $N$,
-\item Anzahl der Messungen $\widetilde{R}$ und
-\item Temperatur des Systems $T$.
+\item Anzahl der Spins $N$
+\item Anzahl der Messungen $R_1$
+\item Temperatur des Systems $T$
 \end{itemize}
 
-Anschließend legen wir ein $N$-langen Bitfeld, welches unseren Anfangszustand $\vert\alpha(0)\rangle$ enthält, und initialisieren es mit zufälligen Daten. Um den aktuellen Operatorstring abspeichern zu können legen wir weiterhin ein Integer-Array $s$ $L$-ter Länge an, welches für jeden Operatorplatz $p$ die Art des Operators (diagonal, off-diagonal oder Einheitsmatrix) -- also $a(p)$ und dessen Position im System $b(p)$ (Koppelung) lagert. Dies können wir gemeinsam in einer Ganzzahl speichern, wenn wir ausnutzen, dass $a\in\{0,1\}$:
+Anschließend legen wir wieder ein boolsches Array der Länge $N$ an, welches unseren Anfangszustand $\vert\alpha(0)\rangle$ enthält, und initialisieren es mit zufälligen Werten. Um den aktuellen Operatorstring abspeichern zu können, legen wir weiterhin ein Integer-Array $s$ der Länge $L$ an, welches für jeden Platz $p$ im String die Art des Operators (diagonal, off-diagonal oder Einheitsmatrix) -- also $a(p)$ und dessen Position im System $b(p)$ (Koppelung) speichert. Dies können wir gemeinsam in einer Ganzzahl speichern, wenn wir ausnutzen, dass $a\in\{0,1\}$:
 
 \begin{equation}
 s(p)=a(p)+2b(p)
 \label{eq:OperatorArrayStorage}
 \end{equation}
 
-wir können die Informationen aus der Ganzzahl $s(p)$ wieder erhalten, wenn wir prüfen, ob
+Wir können die Informationen aus der Ganzzahl $s(p)$ wieder erhalten, wenn wir prüfen, ob
 
 \begin{itemize}
 \item $s(p)=0 \Rightarrow$ Einheitsmatrix,
@@ -279,7 +279,7 @@ Die Position $b(p)$ des Operators erhalten wir, wenn wir mittels einer ganzzahli
 
 \subsection{Simulation}
 
-Für jeden MC-Schritt wird zuerst ein Diagonal Update durchgeführt und anschließend ein Off-Diagonal Loop Update. Am Schluss wird der Cut-Off $L$ nach Abschnitt \ref{sec:cutoff} eventuell weiter noch oben gesetzt, um dem System genug Freiraum zum Einfügen weiterer Operatoren zu geben. D.h. wir verlängern den Operatorstring, um immer genug Einheitsmatrizen frei für diagonale Operatoren zu haben.
+Für jeden MC-Schritt wird zuerst ein Diagonal Update durchgeführt und anschließend ein Off-Diagonal Loop Update. Abschließend wird der Cut-Off $L$ nach Abschnitt \ref{sec:cutoff} eventuell weiter noch oben gesetzt, um dem System genug Freiraum zum Einfügen weiterer Operatoren zu geben, d.h. wir verlängern den Operatorstring, um immer genug Einheitsmatrizen frei für diagonale Operatoren zu haben.
 
 \subsubsection{Diagonal Update}
 
@@ -287,60 +287,131 @@ Bei jedem Diagonal Update wird für jeden Operatorplatz $p$, auf dem bereits ein 
 
 Existiert noch kein Operator auf der Position, versucht man einen diagonalen Operator einzufügen: Die Koppelung $b$ des Operators wird zufällig bestimmt. Wenn die beiden Spins an dieser Koppelung anti-parallel sind, wird mit einem ähnlichen Zufallstest wie oben mit der Wahrscheinlichkeit aus Gl. \ref{eq:EinfuegeWahrscheinlichkeit} entschieden, ob das Einfügen erfolgt. Als Konsquenz würden wir $n$ um 1 erhöhen und $s(p)=2b$ setzen. Um den bis zu $p$ propagierten Zustand $\vert\alpha(p)\rangle$ schnell zu erhalten, schreiben wir ihn in jedem $p$-Schritt mit.
 
-Trifft man auf einen Off-Diagonalen Operator wird nichts am Operatorstring verändert, nur der propagierte Zustand wird angepasst (die beiden Spins vertauschen ihren Zustand).
+Trifft man auf einen Off-Diagonalen Operator, wird nichts am Operatorstring verändert, lediglich der propagierte Zustand wird angepasst (die beiden Spins tauschen ihren Zustand).
 
 \subsubsection{Off-Diagonal Loop Update}
 
-Um nun die durch das Diagonal Update eingefügten Operatoren auch in Off-Diagonale Operatoren zu transformieren (oder zurück), wird der Operatorstring nun systematisch nach Loops gescannt und für jeden Loop wird anschließend mit der Wahrscheinlichkeit 50\% entschieden, diese gesamte Loop zu flippen.
+Um nun die durch das Diagonal Update eingefügten Operatoren auch in Off-Diagonale Operatoren zu transformieren (oder zurück), wird der Operatorstring nun systematisch nach Loops gescannt und für jeden Loop wird anschließend mit der Wahrscheinlichkeit von 50\% entschieden, diesen gesamten Loop zu flippen.
 
-\paragraph{Die Analyse des Operatorstrings} kann wie folgt geschehen:
+\paragraph{Die Analyse des Operatorstrings}
 
-Jeder Operator (der keine Einheitsmatrix ist) besitzt vier Vertizes, das sind die Anknüpfungspunkte an die Spin-Bahnen (zwei oben, zwei unten). Diese erhalten nach Abb. \ref{fig:Vertizes} je eine Typnummer $y\in\{0,1,2,3\}$. Mithilfe dieses $y$ und der Position des Operators im String $p$ kann man jeden Vertex global mit der Zahl $v$ indizieren:
+Jeder Operator (der keine Einheitsmatrix ist) besitzt vier Vertizes, welche die Anknüpfungspunkte an die Spin-Bahnen (zwei oben, zwei unten) sind. Diese erhalten nach Abb. \ref{fig:Vertizes} je eine Typnummer $y\in\{0,1,2,3\}$. Mithilfe dieses $y$ und der Position des Operators im String $p$ kann man jeden Vertex global mit der Zahl $v$ indizieren:
 
 \begin{equation}
 v(y,p)=v+4p
 \label{eq:OperatorVertexStorage}
 \end{equation}
 
-Von der Ganzzahl $v$ kann man wie bei \ref{eq:OperatorArrayStorage} wieder auf die speziellen eigenschaften schließen.
+Von der Ganzzahl $v$ kann man wie bei \ref{eq:OperatorArrayStorage} wieder auf die speziellen Eigenschaften schließen.
 
 \begin{figure}[thb]
   \centering
-  \includegraphics[width=0.6\textwidth]{Bilder/Vertizes}
-  \caption[Mögliche Verwendung der Operatoren mit den Typnummern der Vertizes]{{\bfseries Mögliche Verwendung der Operatoren mit den Typnummern der Vertizes} Quelle: \cite{Sandvik}}
+  \includegraphics[width=0.4\textwidth]{Bilder/Vertizes}
+  \caption[Mögliche Verwendung der Operatoren mit den Typnummern der Vertizes; {\itshape Quelle:} \cite{Sandvik}]{{\bfseries Mögliche Verwendung der Operatoren mit den Typnummern der Vertizes}; {\itshape Quelle:} \cite{Sandvik}}
   \label{fig:Vertizes}
 \end{figure}
 
-Nun gehen wir jede Position $p$ im String durch und verknüpfen Vertizes, die sich auf einer Spin-Bahn gegenüberliegen. Die Verknüpfungen stellen also z.B. die dicken Linien in der Abb. \ref{fig:Off-Diagonal-Loop} dar, die die Operatoren verbinden. D.h. Vertizes stellen die Ecken eines Loop-Gebiets dar, diese Verknüpfungen und die Operatoren die Kanten. Die Verknüpfung wird in einem Verknüpfungs-Array $x$ gespeichert. Zu beachten ist, dass Loops durchaus auch über den periodischen Rand hinweg möglich sind!
+Nun gehen wir jede Position $p$ im String durch und verknüpfen Vertizes, die sich auf einer Spin-Bahn gegenüberliegen. Die Verknüpfungen stellen also die dicken Linien dar, z.B. wie in Abb. \ref{fig:Off-Diagonal-Loop}, die die Operatoren verbinden. D.h. Vertizes stellen die Ecken eines Loop-Gebiets dar, diese Verknüpfungen und die Operatoren die Kanten. Die Verknüpfung wird in einem Verknüpfungs-Array $x$ gespeichert. Zu beachten ist, dass Loops durchaus auch über den periodischen Rand hinweg möglich sind!
 
-\paragraph{Das Flippen der Loops} wird nun Stück für Stück durchgeführt. Für jede Loop wird mit einer 50\% Wahrscheinlichkeit entschieden, ob diese geflippt werden soll. Ist dies der Fall, geht man auf den Kanten des Loop-Gebiets von Operator zu Operator und flippt jeden. Operatoren die mitten in einer Loop liegen werden also nicht verändert. Wird eine Loop geflippt, die sich über die periodischen Ränder hinaus erstreckt, muss anschließend der Anfangszustand demensprechend verändert werden.
+\paragraph{Flippen der Loops}
+
+Dieses wird nun Stück für Stück durchgeführt: Für jede Loop wird mit einer Wahrscheinlichkeit 50\% entschieden, ob diese geflippt werden soll. Ist dies der Fall, geht man auf den Kanten des Loop-Gebiets von Operator zu Operator und flippt einen jeden. Operatoren, die mitten in einer Loop liegen, werden also nicht verändert. Wird eine Loop geflippt, die sich über die periodischen Ränder hinaus erstreckt, muss anschließend der Anfangszustand demensprechend verändert werden.
 
 \subsection{Analyse}
 
-Die abgespeicherten Werte für $n$ werden nach der Simulation verwendet, um sie -- wie in Abschnitt \ref{sec:Autokorrelation} erklärt -- zu analysieren. Verwendung zur Berechnung der Größen {\itshape Energie pro Spin} und {\itshape Wärmekapazität pro Spin} finden die Gleichungen \ref{eq:QuantenEnergieMitShift} und \ref{eq:QuantenWaermeKapazitaetBest}.
+Die abgespeicherten Werte für $n$ werden nach der Simulation verwendet, um sie -- wie in Abschnitt \ref{sec:Autokorrelation} erklärt -- zu analysieren. Ihre Anwendung zur Berechnung der Größen {\bfseries Energie} und {\bfseries Wärmekapazität} werden in den Gleichungen \ref{eq:QuantenEnergieMitShift} und \ref{eq:QuantenWaermeKapazitaetBest} beschrieben.
 
 \subsection{Quellcode}
 
-Der vom Author geschriebene C++ Quellcode für diese Simulation ist im Anhang \ref{sec:code} zu finden. Folgende Dateien sind hierfür relevant:
+Der vom Author geschriebene C++ Quellcode ist im Anhang \ref{sec:code} zu finden. Folgende Dateien sind für diese quantenmechanische Simulation relevant:
 
 \begin{itemize}
-\item\ref{code:SIM}: Hauptprogramm
-\item\ref{code:AbstractLattice}: Definition eines abstrakten Gittermodells
-\item\ref{code:Open1DLattice}: 1-dimensionales Kettenmodell mit offenen Randbedingungen
-\item\ref{code:Periodic1DLattice}: 1-dimensionales Kettenmodell mit periodischen Randbedingungen
-\item\ref{code:Periodic2DLattice}: 2-dimensionales Gittermodell mit periodischen Randbedingungen
-\item\ref{code:AbstractAlgorithm}: Definition eines abstrakten Algorithmus' zur Simulation
+\item\ref{code:SIM}: Hauptprogramm SIM
+\item\ref{code:AbstractLattice}: Abstrakte Gitterklasse
+\item\ref{code:Open1DLattice}: 1D Kette mit offenen Randbedingungen
+\item\ref{code:Periodic1DLattice}: 1D Kette mit periodischen Randbedingungen
+\item\ref{code:Periodic2DLattice}: 2D Gitter mit periodischen Randbedingungen
+\item\ref{code:AbstractAlgorithm}: Abstrakte Algorithmusklasse
 \item\ref{code:SSEAlgorithm}: SSE Algorithmus
-\item\ref{code:AbstractAnalyzer}: Definition eines abstrakten Analysemoduls
-\item\ref{code:SseEnergyAnalyzer}: Analysemodul für die Energie (SSE)
-\item\ref{code:SseHeatCapacityAnalyzer}: Analysemodul für die Wärmekapazität (SSE)
+\item\ref{code:AbstractAnalyzer}: Abstrakte Analyseklasse
+\item\ref{code:SseEnergyAnalyzer}: Analyse für die Energie (SSE)
+\item\ref{code:SseHeatCapacityAnalyzer}: Analyse für die Wärmekapazität (SSE)
 \end{itemize}
 
 \section{Ergebnisse und Diskussion}
 
-\subsection{ED}
+Im Folgenden sind die Messergebnisse der SSE-Simulationen aufgeführt. Bis auf die explizite Erwähnung im ersten Unterabschnitt wurde auf eine Fehlerdarstellung in den Diagrammen verzichtet, da die Fehler ihrer (kleinen) Größe wegen nicht darstellbar waren.
 
-4er Kette mit Offenen Randbed
+\subsection{Heisenbergkette mit periodischen Randbedingungen}
+
+Auf den Abbildungen \ref{fig:KettenEnergieTemperatur} und \ref{fig:KettenWaermekapazitaetTemperatur} sieht man die mittlere Energie und die mittlere Wärmekapazität für verschieden große Systeme (periodische Ketten) aufgetragen. Diese Kurven verlaufen stets übereinander, da im 1-dimensionalen Fall noch kein Phasenübergang auftritt. Das System befindet sich also entweder nahe dem Grundzustand oder besitzt bereits eine so geringe Korrelationslänge, dass für verschiedene Größen keine Effekte auftreten (vgl. Erörterung in \ref{sec:IsingEnergie}). Die jeweils gleiche Grundzustandsenergie von $-0.4432$ stimmt sehr gut mit dem in \cite{Diplom} auf Seite 58 angegeben Wert überein.
+
+\begin{figure}[bth]
+  \centering
+  \subfloat[{\bfseries Mittelwerte der Energie}]{
+    \label{fig:KettenEnergieTemperatur}
+    \includegraphics[width=0.48\textwidth]{Diagramme/SSE/Ketten_Energie-Temperatur} 
+  }
+  \subfloat[{\bfseries Mittelwerte der Wärmekapazität}]{
+    \label{fig:KettenWaermekapazitaetTemperatur}
+    \includegraphics[width=0.48\textwidth]{Diagramme/SSE/Ketten_Waermekapazitaet-Temperatur} 
+  }
+  \caption[Mittelwerte der Energie und Wärmekapazität; {\itshape Quelle:} Eigenwerk]{Mittelwerte der Energie und Wärmekapazität für verschiedene Systemgrößen einer periodischen Kette bei 100000 Messpunkten pro Temperaturpunkt; {\itshape Quelle:} Eigenwerk}
+  \label{fig:KettenEnergieWaermekapazitaet}
+\end{figure}
+
+Wir betrachten nun noch explizit den absoluten Fehler (Standardabweichung) in Abb. \ref{fig:KettenFehlerEnergie}: Mit steigender Systemgröße tritt also ein immer stärker Effekt zu Tage; bei hohen Temperaturen gibt es wesentlich mehr mögliche Konfigurationen. All diese Konfigurationen haben eine ähnliche Energie und müssen gesampelt werden. Bei $T=0$ muss das System nur zum Grundzustand finden.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.48\textwidth]{Diagramme/SSE/Ketten_FehlerEnergie-Temperatur} 
+  \caption[Absoluter Fehler der Energie; {\itshape Quelle:} Eigenwerk]{{\bfseries Absoluter Fehler der Energie} für verschiedene Systemgrößen einer periodischen Kette bei 100000 Messpunkten pro Temperaturpunkt; {\itshape Quelle:} Eigenwerk}
+  \label{fig:KettenFehlerEnergie}
+\end{figure}
+
+\subsection{Heisenberggitter mit periodischen Randbedingungen}
+
+Nach Korrolar 1.11 aus \cite{Branch} besitzt das 2-dimensionale Gitter im Gegensatz zum 1D-Fall einen Phasenübergang, d.h. zur Temperatur $T_c$ hin divergiert die Korrelationslänge und damit die Größe der Weißschen Bezirke (Cluster), so dass in der Umgebung um diesen kritischen Punkt die Größe des Systems eine gravierende Rolle spielt. Beide Grundzustandsenergien, -0.67887 und -0.702, werden durch \cite{Scaling} bestätigt.
+
+\begin{figure}[bh]
+  \centering
+  \subfloat[{\bfseries Mittelwerte der Energie}]{
+    \label{fig:GitterEnergieTemperatur}
+    \includegraphics[width=0.48\textwidth]{Diagramme/SSE/Gitter_Energie-Temperatur} 
+  }
+  \subfloat[{\bfseries Mittelwerte der Wärmekapazität}]{
+    \label{fig:GitterWaermekapazitaetTemperatur}
+    \includegraphics[width=0.48\textwidth]{Diagramme/SSE/Gitter_Waermekapazitaet-Temperatur} 
+  }
+  \caption[Mittelwerte der Energie und Wärmekapazität; {\itshape Quelle:} Eigenwerk]{Mittelwerte der Energie und Wärmekapazität für verschiedene Systemgrößen eines periodischen Gitters bei 100000 Messpunkten pro Temperaturpunkt; {\itshape Quelle:} Eigenwerk}
+  \label{fig:ModellEnergieWaermekapazitaet}
+\end{figure}
+
+\subsection{Vergleich verschiedener Modelle / Exakte Diagonalisierung}
+
+In den Abbildungen \ref{fig:AlleEnergieTemperatur} und \ref{fig:AlleWaermekapazitaetTemperatur} sind die Energie und die Wärmekapazität für die drei betrachteten Modelle (Kette mit offenen, Kette mit periodischen und Gitter mit periodischen Randbedingungen) aufgetragen. Die exakte, dunklere Linie beschreibt die Werte der ED-Methode {\itshape(Exakte Diagonalisierung)}.
+
+Die Energiekurven zeigen im 1-dimensionalen Fall keinen sichtbaren Unterschied zwischen den Methoden SSE und ED, wohingegen die SSE-Werte für das Gitter eine gut sichtbare höhere Ungenauigkeit aufweisen. Die Differenz der Grundzustandsenergien erklären sich wohl Hauptsächlich durch die größere Anzahl von Koppelungen pro Spin, qualitativ zeigen die Kurven allerdings ebenfalls kaum Unterschiede.
+
+Die Ableitung der Energie nach der Temperatur, die Wärmekapazität, ist wie erwartet deutlich ungenauer. Besonders in den Temperaturen nahe 0 spielen arithmetische Fehler der Implementierung (Maschinengenauigkeit) eine große Rolle, da dort große Zahlen subtrahiert werden. Auffallend ist, dass die beiden periodischen Modelle diesselbe maximale Wärmekapazität besitzen.
+
+\begin{figure}[bh]
+  \centering
+  \subfloat[{\bfseries Mittelwerte der Energie}]{
+    \label{fig:AlleEnergieTemperatur}
+    \includegraphics[width=0.48\textwidth]{Diagramme/SSE/Alle_Energie-Temperatur} 
+  }
+  \subfloat[{\bfseries Mittelwerte der Wärmekapazität}]{
+    \label{fig:AlleWaermekapazitaetTemperatur}
+    \includegraphics[width=0.48\textwidth]{Diagramme/SSE/Alle_Waermekapazitaet-Temperatur} 
+  }
+  \caption[Mittelwerte der Energie und Wärmekapazität; {\itshape Quelle:} Eigenwerk]{Mittelwerte der Energie und Wärmekapazität für die verschiedenen Modelle 1D-Offen, 1-Periodisch und 2D-Periodisch mit der Spinanzahl 4 bei 100000 Messpunkten pro Temperaturpunkt; {\itshape Quelle:} Eigenwerk}
+  \label{fig:AlleEnergieWaermekapazitaet}
+\end{figure}
+
+An dem Beispiel der 4 Spin langen Heisenbergkette mit offenen Randbedingungen, wollen wir uns nun noch die Verwendung der Exakten Diagonalisierung veranschaulichen \cite{Ham}:
+
+Da der Hamiltonian jeden Unter-Zustandsraum $\Omega_i$ aller Basiszustände diesselbe Anzahl $i$ aufwärtsgerichteter Spins (siehe \cite{Spincount}) stabil lässt (Erhaltung der Summe aller $S_j^z$), stellt er in einer geeignet sortierten Basis eine Blockmatrix dar:
 
 \tiny
 \[
@@ -371,9 +442,8 @@ H=\left(\begin{blockarray}{cccccccccccccccc}
 \begin{block}{ccccccccccccccc\{c\}}
 0&&&&&&&&&&&&&&& 0.75  \\
 \end{block}
-\end{blockarray}\right)\\
-\lambda_i
+\end{blockarray}\right)
 \]
 \normalsize
 
-hat die Eigenwerte \{0.75, 0.75, 0.75, 0.75, 0.75, 0.457107, 0.457107, 0.457107, 0.116025, -0.25, -0.25, -0.25, -0.957107, -0.957107, -0.957107, -1.61603\}
+Die Blöcke können nun einzeln diagonalisiert werden, was einen deutlichen Performancegewinn gegenüber einer gesamten Diagonalisierung darstellt. Die Eigenwerte der obigen Matrix sind \{0.75, 0.75, 0.75, 0.75, 0.75, 0.457107, 0.457107, 0.457107, 0.116025, -0.25, -0.25, -0.25, -0.957107, -0.957107, -0.957107, -1.61603\}. Mithilfe dieser können nun z.B. die Boltzmanngewichte bzw. die Zustandssumme berechnet werden.
