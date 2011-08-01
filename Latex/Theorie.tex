@@ -2,6 +2,7 @@
 \thispagestyle{empty}
 \cleardoublepage
 \chapter[Theorie der Monte-Carlo Simulation]{Theorie der\\ Monte-Carlo Simulation}
+\label{sec:Theorie}
 
 \section{Geschichte}
 
@@ -37,7 +38,7 @@ Oft ist es nicht möglich, die oben angegebene Summe auszuwerten (z.B. wenn $\Ome
 Eine Markov-Kette beginnt mit einem beliebigen Anfangszustand $\sigma_0$. Von diesem aus werden mit einer Übergangswahrscheinlichkeit $(\boldsymbol{W})_{\sigma_0\sigma_1}$ Sprünge im Zustandsraum ausgeführt (MC-Schritte), welche die neuen Kettenglieder $\sigma_2\sigma_3\ldots$ definieren. Damit die Markov-Kette zur gewünschten Wahrscheinlichkeitsverteilung $p_\sigma$ führt, muss bei der Bildung von $\boldsymbol{W}$ auf die zwei folgenden Bedingungen geachtet werden:
 
 \begin{enumerate}
-\item Die Bildung der Kette muss der {\bfseries Ergodizität} folgen. D.h. sie muss theoretisch alle Zustände erreichen können (was sie in der Praxis natürlich nicht tut, da wir $R\ll \left|\Omega\right|$ wählen).
+\item Die Bildung der Kette muss der {\bfseries Ergodizität}\label{sec:Ergodizitaet} folgen. D.h. sie muss theoretisch alle Zustände erreichen können (was sie in der Praxis natürlich nicht tut, da wir $R\ll \left|\Omega\right|$ wählen).
 \item Die Übergangswahrscheinlichkeiten $\boldsymbol{W}$ müssen insofern im {\bfseries Gleichgewicht} sein, als dass
 
 \begin{equation}
@@ -65,6 +66,7 @@ Anschaulich besagt sie, dass ein Sprung von einem Markov-Kettenglied zum Nachbar
 Hierbei verwendet man im letzten Schritt, dass der Zustand $\nu$ in jedem Fall in irgendeinen nächsten Zustand $\sigma$ übergeht, die Zeilensummen der Matrix also jeweils 1 ergeben.
 
 \section{Metropolis Algorithmus}
+\label{sec:Metropolis}
 
 Die MCS erfordert also für eine gegebene Wahrscheinlichkeitsverteilung $p_\sigma$ eine Wahl der Übergangswahrscheinlichkeiten $\boldsymbol{W}$, sodass $p_\sigma$ {\bfseries stationär} ist. 1953 stellte Nicholas Metropolis {\itshape et al.} eine solche Wahl vor:
 
@@ -79,6 +81,7 @@ p_\sigma/p_\nu & p_\sigma<p_\nu\\
 Es kann leicht gezeigt werden, dass dieser Vorschlag sogar {\itshape Detailed Balance} (Gl. \ref{eq:DetailedBalance}) erfüllt. Ein weiterer Algorithmus ist nach Roj J. Glauber benannt ({\itshape Glauber dynamics}) \cite{Glauber}.
 
 \section{Thermalisierung}
+\label{sec:Thermalisierung}
 
 Nachdem als Anfangszustand der Markov-Kette ein beliebig ausgewählter Zustand verwendet wird, werden die ersten Kettenglieder in ihrer Verteilung noch weit von der angestrebten Wahrscheinlichkeitsverteilung $p_\sigma$ abweichen, auch weil die verlangte {\bfseries Ergodizität} in den wenigen Schritten noch gar nicht zum Tragen kommen konnte.
 
