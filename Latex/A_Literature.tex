@@ -1,0 +1,7 @@
+\newpage
+\thispagestyle{empty}
+\cleardoublepage
+\let\bibnamePARENT\bibname
+\renewcommand{\bibname}{\addcontentsline{toc}{chapter}{\bibnamePARENT}\bibnamePARENT}
+\bibliographystyle{alphadin}
+\bibliography{Literature}

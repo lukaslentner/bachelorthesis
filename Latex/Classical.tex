@@ -1,0 +1,257 @@
+\newpage
+\thispagestyle{empty}
+\cleardoublepage
+\chapter[Klassische MCS am Beispiel des Ising-Modells]{Klassische MCS\\\LARGE am Beispiel des Ising-Modells}
+\label{sec:Ising}
+
+Um die Grundlagen der Monte-Carlo Simulation (MCS) kennenzulernen, betrachten wir zuerst die Simulation des klassischen, 2-dimensionalen Ising-Modells mit periodischer Randbedingung. Als Messgrößen wählen wir die typischen thermodynamischen Größen: Den Mittelwert der Energie, Wärmekapazität, Magnetisierung und magnetischen Suszeptibilität. Außerdem betrachten wir die absolute Magnetisierung und die absolute magnetische Suszeptibilität, also den Mittelwert des Absolutbetrags der Spin-Summe und dessen Varianz (weil sich ohne äußeres Magnetfeld die Magnetisierung immer auf 0 mittelt). All diese Größen werden pro Spin gemessen.
+
+Um ein Gegenüberstellen zu erleichtern, hat dieses und das nächste Kapitel eine analoge Struktur: Im ersten Abschnitt knüpfen wir an Kapitel \ref{sec:Theorie} an, d.h. wir werden unseren Zustandsraum $\Omega$ und die Übergangswahrscheinlichkeiten $\boldsymbol{W}$ für dieses Szenario definieren. Danach betrachten wir die Implementierung der erstellten Anwendung detailiert. Im letzten Abschnitt werden die Ergebnisse verschiedener Simulationen vorgestellt und diskutiert.
+
+\section{Methode}
+
+\subsection{Das Ising-Modell}
+
+Für das klassische, ferromagnetische Ising-Modell ist der Hamiltonian
+
+\begin{equation}
+H_{\mathrm{Ising}}=-\sum_{\left\langle i,j\right\rangle}J_{ij}\cdot S_i^zS_j^z-h\sum_{i=0}^{N-1}\mu_{i}\cdot S_i^z
+\label{eq:IsingHamiltonian}
+\end{equation}
+
+zusammengesetzt aus einer magnetischen $z$-Koppelung benachbarter Spins $\left\langle i,j\right\rangle$, die durch die Bindungsmatrix $\boldsymbol{J}$ gewichtet wird, und der Wechselwirkung eines externen Magnetfelds $\boldsymbol{h}=(0,0,h)^T$ mit den magnetischen Momenten $\boldsymbol{\mu}=(0,0,\mu)^T$. Für unser Beispiel setzten wir alle $J_{ij}=1$ sowie $\mu_i=1$ (Homogenität) und betrachten die Anordnung ohne Magnetfeld ($h=0$) -- da uns nur die $z$-Richtung interessiert, setzen wir $S=S^z\in\{-1;1\}$. Der Hamiltonian erhält dann die vereinfachte Struktur:
+
+\begin{equation}
+H=-\sum_{\left\langle i,j\right\rangle}S_iS_j
+\label{eq:BeispielIsingHamiltonian}
+\end{equation}
+
+\subsection{Sampling}
+\label{sec:KlassischesSampling}
+
+Wegen der vorgegebenen Teilchenanzahl $N$ und Temperatur $T$ können wir für eine beliebige Größe $A$ den Mittelwert
+
+\begin{equation}
+\langle A\rangle =\sum_{\sigma\in\Omega}\frac{e^{-\beta E_\sigma}}{Z}\cdot A(\sigma )
+\label{eq:KanonischerMittelwert}
+\end{equation}
+
+als kanonisches Ensamble ansetzen, wobei
+
+\begin{equation}
+Z=\sum_{\sigma\in\Omega}e^{-\beta E_\sigma}
+\label{eq:Zustandssumme}
+\end{equation}
+
+die kanonische Zustandssumme, $\beta$ die reduzierte Temperatur $1/T$ (wir setzten $k_B=1$) und $E_\sigma$ die Energie eines gewissen mikroskopischen Zustandes $\sigma$ (Konfiguration) darstellt. Analog zum Abschnitt \ref{sec:Metropolis} wenden wir nun die {\bfseries Monte-Carlo Methode} auf diese Konfigurationen $\in\{1,2\}^N$ an. Im Vergleich zur Gl. \ref{eq:Mittelwert} sieht man hierbei, dass die Wahrscheinlichkeit eines Zustandes Boltzmann-verteilt ist:
+
+\begin{equation}
+p_\sigma=\frac{e^{-\beta E_\sigma}}{Z}
+\label{eq:KanonischeWahrscheinlichkeit}
+\end{equation}
+
+Die Gewichte (speziell die Zustandssumme) sind allerdings schwer zu berechnen, da der Zustandsraum in solch einem Spin-System exponentiell mit der Spinanzahl anwächst ($\vert\Omega\vert\sim 2^N$) und eine numerische Berechnung von $Z$ für große Systeme oft nicht mehr möglich ist. Für den {\bfseries Metropolis Algorithmus} (siehe Gl. \ref{eq:Metropolis}), benötigen wir allerdings diese einzelnen Gewichte gar nicht, sondern können uns mit deren Verhältnissen, die dann die Übergangswahrscheinlichkeiten $\boldsymbol{W}$ darstellen, begnügen:
+
+\begin{equation}
+W_{\nu\sigma}=\begin{cases}
+e^{-\beta(E_\sigma-E_\nu)} & E_\sigma>E_\nu\\
+1                          & E_\sigma\leq E_\nu
+\end{cases}
+\label{eq:KanonischerMetropolis}
+\end{equation}
+
+\section{Implementierung}
+\label{sec:KlassischeImplementierung}
+
+Die Anwendung orientiert sich an \cite{Sandvik}. Sie gliedert sich grob in die Initialisierung des Systems, die Simulation des Modells sowie die Analyse der Messdaten. Um die gewünschten Größen abhängig von der Temperatur betrachten zu können, führen wir das Programm für mehrere Temperaturen aus.
+
+\subsection{Initialisierung}
+
+Generell müssen zuerst folgende Parameter festgelegt werden:
+
+\begin{itemize}
+\item Anzahl der Spins $N$,
+\item Anzahl der Messungen $R_1$ und
+\item Temperatur des Systems $T$.
+\end{itemize}
+
+Für den Status der Spins legen wir ein boolsches Array der Länge $N$ an und initialisieren es mit zufälligen Werten (Anfangszustand). Da sich alle Messgrößen von der Energie und der Spin-Summe ($\approx$ Magnetisierung, siehe Abschnitt \ref{sec:KlassischeErgebnisse}) 
+
+\begin{equation}
+S=\sum_{i=0}^{N-1}S_i
+\label{eq:SpinSumme}
+\end{equation}
+
+ableiten lassen, speichern wir immer deren aktuelle Werte ab. Wie wir später sehen werden, können wir beide Werte in jedem MC-Schritt direkt angepassen (Update) und müssen diese nicht jedes Mal erneut berechnen (zu Beginn ist dies aber natürlich vonnöten).
+
+\subsection{Simulation}
+
+Um eine Markov-Kette der Länge $R$ zu sampeln, verwenden wir eine Schleife, die jeweils einen MC-Schritt durchführt. Ab $R_1$ Durchläufen (Thermalisierung, siehe Abschnitt \ref{sec:Thermalisierung}) legen wir jedes Mal zusätzlich die aktuelle Energie, die Magnetisierung ($M=S/N$) und die absolute Magnetisierung ($M'=\vert S\vert/N$) in einem geeigneten Array ab.
+
+\paragraph{Monte-Carlo Schritt}
+
+Wir erzeugen je das nächste Markov-Kettenglied, indem wir versuchen, jeden Spin des Systems umzudrehen (engl. flip). Das Umdrehen wird jeweils gestattet, wenn eine Zufallszahl zwischen 0 und 1 kleiner ist als das Boltzmanngewicht
+
+\begin{equation}
+e^{-\beta\Delta E}\ \mathrm{,}
+\label{eq:Gewicht}
+\end{equation}
+
+wobei $\Delta E$ der Energieunterschied zwischen der neuen, möglichen Konfiguration und der aktuellen ist. Damit decken wir bereits die Gl. \ref{eq:KanonischerMetropolis} voll ab, da die Zufallszahl im zweiten Fall ($\Delta E<0\Rightarrow W_{\nu\sigma}=1$) auf jeden Fall kleiner ist als das Boltzmanngewicht.
+
+\paragraph{Updates}
+
+Wird das Umdrehen eines Spins erlaubt, modifizieren wir das Spin-Array und addieren zur aktuellen Energie und Spin-Summe den berechneten Unterschied $\Delta E$ und $\Delta S$:
+
+\begin{itemize}
+\item Zu $\Delta E$ tragen nur die Koppelungen zwischen dem Spin, den wir umdrehen wollen, und dessen Nachbaren bei. Diese sind im 2-dimensionalen Gitter die vier Spins über, unter sowie links und rechts von ihm.
+\item $\Delta S$ ergibt sich einfach aus dem alten Status des Spins ($\pm2$).
+\end{itemize}
+
+\subsection{Analyse}
+
+Die Mittelwerte folgender Größen wollen wir berechnen {\bfseries(immer pro Spin)}:
+
+\begin{align}\
+\mathrm{Energie:}\quad & \left\langle\frac{E}{N}\right\rangle=\frac{-\partial_\beta\ln Z}{N}=\left\langle \frac{H}{N}\right\rangle\ \mathrm{,}\label{eq:Energie}\\[2mm]
+\mathrm{W"armekapazit"at:}\quad & \left\langle\frac{C}{N}\right\rangle=\frac{\partial_T H}{N}=\frac{N}{T^2}\left(\left\langle\left(\frac{H}{N}\right)^2\right\rangle-\left\langle\frac{H}{N}\right\rangle^2\right)\ \mathrm{,}\label{eq:Waermekapazitaet}\\[2mm]
+\mathrm{Magnetisierung:}\quad & \left\langle\frac{M}{N}\right\rangle=\frac{T\partial_B\ln Z}{N}=\left\langle\frac{S_i}{N}\right\rangle\ \mathrm{,}\label{eq:Magnetisierung}\\[2mm]
+\mathrm{magnetische\ Suszeptibilit"at:}\quad & \left\langle\frac{\chi}{N}\right\rangle=\frac{\partial_B M}{N}=\frac{N}{T}\left(\left\langle\left(\frac{S_i}{N}\right)^2\right\rangle-\left\langle\frac{S_i}{N}\right\rangle^2\right)\ \mathrm{,}\label{eq:Suszeptibilitaet}\\[2mm]
+\mathrm{abs.\ Magnetisierung:}\quad & \left\langle\frac{M'}{N}\right\rangle=\left\langle\left|\frac{S_i}{N}\right|\right\rangle\ \mathrm{,}\label{eq:AbsoluteMagnetisierung}\\[2mm]
+\mathrm{abs.\ mag.\ Suszeptibilit"at:}\quad & \left\langle\frac{\chi'}{N}\right\rangle=\frac{N}{T}\left(\left\langle\left|\frac{S_i}{N}\right|^2\right\rangle-\left\langle\left|\frac{S_i}{N}\right|\right\rangle^2\right)\ \mathrm{.}\label{eq:AbsoluteSuszeptibilitaet}
+\end{align}
+
+Für jede dieser Größen werden -- wie in Abschnitt \ref{sec:Autokorrelation} ausgeführt -- zuerst die Autokorrelationszeit berechnet und anschließend die Messdaten gruppiert und schließlich gemittelt.
+
+\subsection{Quellcode}
+
+Der vom Author geschriebene C++ Quellcode ist im Anhang \ref{sec:code} zu finden. Folgende Dateien sind für diese, klassische Simulation relevant:
+
+\begin{itemize}
+\item\ref{code:SIM}: Hauptprogramm SIM
+\item\ref{code:AbstractLattice}: Abstrakte Gitterklasse
+\item\ref{code:Periodic2DLattice}: 2D Gitter mit periodischen Randbedingungen
+\item\ref{code:AbstractAlgorithm}: Abstrakte Algorithmusklasse
+\item\ref{code:ISINGAlgorithm}: Ising Algorithmus
+\item\ref{code:AbstractAnalyzer}: Abstrakte Analyseklasse
+\item\ref{code:IsingEnergyAnalyzer}: Analyse für die Energie (Ising)
+\item\ref{code:IsingHeatCapacityAnalyzer}: Analyse für die Wärmekapazität (Ising)
+\item\ref{code:IsingMagnetisationAnalyzer}: Analyse für die Magnetisierung (Ising)
+\item\ref{code:IsingSusceptibilityAnalyzer}: Analyse für die magnetische Suszeptibilität (Ising)
+\item\ref{code:IsingAbsoluteMagnetisationAnalyzer}: Analyse für die absolute Magnetisierung (Ising)
+\item\ref{code:IsingAbsoluteSusceptibilityAnalyzer}: Analyse für die absolute magnetische Suszeptibilität (Ising)
+\end{itemize}
+
+\section{Ergebnisse und Diskussion}
+\label{sec:KlassischeErgebnisse}
+
+Bei der graphischen Aufbereitung wurde der Übersichtlichkeit wegen auf eine Angabe des Fehlers verzichtet (im Hauptteil werden wir sie gesondert darstellen). Für die Mittelwerte der Grundgrößen $E$, $M$ und $M'$ sind diese kleiner als graphisch darstellbar. Mittelwerte weiterführender Größen $C$, $\chi$ und $\chi'$ besitzen dagegen üblicherweise einen signifikanten Fehler in der Nähe des Phasenübergangs \cite{Nolting}
+
+\begin{equation}
+T_c=\frac{2}{\ln(1+\sqrt{2})}\approx 2.269185\ \mathrm{,}
+\label{eq:IsingTC}
+\end{equation}
+
+ansonsten gilt dasselbe wie bei den Grundgrößen.
+
+\subsection{Mittelwert der Energie und Wärmekapazität}
+\label{sec:IsingEnergie}
+
+\begin{figure}[bh]
+  \centering
+  \subfloat[{\bfseries Mittelwerte der Energie}]{
+    \label{fig:KMCSEnergie}
+    \includegraphics[width=0.48\textwidth]{Diagrams/KMCS/Energy-Temperature} 
+  }
+  \subfloat[{\bfseries Mittelwerte der Wärmekapazität}]{
+    \label{fig:KMCSWaermekapazitaet}
+    \includegraphics[width=0.48\textwidth]{Diagrams/KMCS/SpecificHeat-Temperature} 
+  }
+  \caption[Mittelwerte der Energie und Wärmekapazität; {\itshape Quelle:} Eigenwerk]{Mittelwerte der Energie und Wärmekapazität für verschieden große Gitter mit periodischen Randbedingungen bei 10000 Messpunkten pro Temperaturpunkt; {\itshape Quelle:} Eigenwerk}
+  \label{fig:KMCSEnergieWaermekapazitaet}
+\end{figure}
+
+Der Mittelwert der {\bfseries Energie} (Gl. \ref{eq:Energie}) in Abb. \ref{fig:KMCSEnergie} verläuft erwartungsgemäß von -2 nach 0: Für kleine Temperaturen stehen alle Spins in die gleiche Richtung ({\itshape Grundzustand}), da die Wahrscheinlichkeit eines Flips (Gl. \ref{eq:Gewicht}) eines einzelnen Spins gegen alle anderen verschwindend gering ist. Weil in einem 2-dimensionalen Gitter mit periodischen Randbedingungen die Anzahl der Koppelungen $N_b=2N$ ist, hat der Mittelwert hier den Wert -2. Je höher jedoch die Temperatur steigt, je geringer wird der Einfluss des Boltzmann-Gewichts und führt letztendlich zu einer Gleichverteilung der Spins, die für $T\rightarrow\infty$ $\left\langle E/N\right\rangle\rightarrow0$ liefert ({\itshape thermisches Chaos}).
+
+Am Mittelwert der {\bfseries Wärmekapazität} (Gl. \ref{eq:Waermekapazitaet}) in Abb. \ref{fig:KMCSWaermekapazitaet}, also der Ableitung der mittleren Energie nach $T$, erkennt man deutlich den Phasenübergang, der sich durch den höchsten Wert für die Steigung der mittleren Energie erkenntlich macht. Dies erklärt sich durch die Bildung von gleichartig ausgerichteten (korrelierten) Spin-Clustern (Weißsche Bezirke) in der Größenordnung der Korrelationslänge $\xi$ \cite{Nolting}. Da die Größe außerdem die Varianz der Energie darstellt, erklärt sich der Verlauf ebenfalls aus der starken Reaktion der Energie auf geringste Temperaturänderungen; hingegen sind Grundzustand und thermisches Chaos weitgehend "`stabil"'.
+
+Ein Vergleich {\bfseries verschiedener Systemgrößen} zeigt eine Verschiebung des Peaks der mittleren Wärmekapazität als auch dessen Anwachsen, während abseits des Phasenübergangs kein Unterschied festzustellen ist. Der Grund hierfür kann wieder mit den Weißschen Bezirken plausibel gemacht werden (siehe Seite 33 in \cite{Sandvik}):
+
+\begin{itemize}
+	\item $T\ll T_c$: Nahe am Grundzustand erwarten wir unabhängig von der Systemgröße einen $\infty$-größen Bezirk mit vereinzelten Störungen ($\xi=\infty$).
+	\item $T\gg T_c$: Im thermischen Chaos ($\xi$ klein) von größtenteils dekorrelierten Einzelspins spielt die makroskopische Systemgröße $N$ keine Rolle.
+	\item $T\approx T_c$: Nahe dem Phasenübergang nimmt jeder Bezirk einen makroskopischen Anteil des Systems ein, sodass sich das Verhalten bereits bei kleinen Änderungen massiv ändert.
+\end{itemize}
+
+Um schließlich die reale Übergangstemperatur $T_c$ für $N\rightarrow\infty$ (thermodynamischer Limes) zu finden und die kritischen Exponenten bestimmen zu können, müssen wir einen polynominalen Fit über mehrere Systemgrößen hinweg verwenden (Finite Size Scaling) \cite{Buch}. Für die obige Simulation ergab sich:
+
+\begin{table}[htb]
+	\centering
+  \begin{tabular}{|l|l|l|l|}
+    \hline
+  	         & Eigene Werte & Exakter Wert & Wert durch Molekularfeldnäherung \\
+    \hline
+    $T_c$    & 2.26228      & 2.269185     & {\itshape Kein Wert} \\
+    $\nu$    & 1            & 1            & 0.5 \\
+    $\gamma$ & 1.75958      & 1.75         & 1   \\
+    $\beta$  & 0.125        & 0.125        & 0.5 \\
+    \hline
+	\end{tabular}
+	\caption{Übergangstemperatur und kritische Exponenten}
+	\label{tab:kritischeexponenten}
+\end{table}
+
+\subsection{Autokorrelationszeit der Energie}
+
+Wie wir sehen, nimmt auch die {\bfseries Autokorrelationszeit der Energie} $\tau_E$ (Gl. \ref{eq:Autokorrelationszeit}) in Abb. \ref{fig:KMCSAutokorrelationszeitEnergie} um den Phasenübergang herum stark zu. Das bedeutet, dass die Konfigurationen über mehrere MC-Schritte hinweg korrelieren bzw. statistisch abhängig sind. Begründet liegt dies in der Tatsache, dass die Korrelationslänge $\xi$ -- wie schon mehrfach erwähnt -- am Phasenübergang divergiert und die makroskopische Propagation von Information durch das System viel Zeit benötigt \cite{Buch}. $\tau_E$ ist neben der Temperatur auch vom System insbesondere dessen Größe abhängig.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.48\textwidth]{Diagrams/KMCS/AutocorrelationtimeEnergy-Temperature} 
+  \caption[Autokorrelationszeiten der Energie; {\itshape Quelle:} Eigenwerk]{{\bfseries Autokorrelationszeiten der Energie} für verschieden große Gitter mit periodischen Randbedingungen bei 10000 Messpunkten pro Temperaturpunkt; {\itshape Quelle:} Eigenwerk}
+  \label{fig:KMCSAutokorrelationszeitEnergie}
+\end{figure}
+
+\subsection{Mittelwert der Magnetisierung und magnetischen Suszeptibilität}
+
+\begin{figure}[bh]
+  \centering
+  \subfloat[{\bfseries Mittelwerte der Magnetisierung}]{
+    \label{fig:KMCSMagnetisierung}
+    \includegraphics[width=0.48\textwidth]{Diagrams/KMCS/Magnetization-Temperature} 
+  }
+  \subfloat[{\bfseries Mittelwerte der mag. Suszeptibilität}]{
+    \label{fig:KMCSSuszeptibilitaet}
+    \includegraphics[width=0.48\textwidth]{Diagrams/KMCS/MagneticSusceptibility-Temperature} 
+  }
+  \caption[Mittlere Magnetisierung und magnetische Suszeptibilität; {\itshape Quelle:} Eigenwerk]{Mittlere Magnetisierung und magnetischen Suszeptibilität für verschieden große Gitter mit periodischen Randbedingungen bei 10000 Messpunkten pro Temperaturpunkt; {\itshape Quelle:} Eigenwerk}
+  \label{fig:KMCSMagnetisierungUndSuszeptibilitaet}
+\end{figure}
+
+Die weiter oben angesprochene (dekorrelierte) Gleichverteilung der Spins bei hohen Temperaturen, drückt sich verständlicherweise in der verschwindenen, mittleren {\bfseries Magnetisierung} (Gl. \ref{eq:Magnetisierung}) in Abb. \ref{fig:KMCSMagnetisierung} für $t\gg T_c$ aus. Verringert man vom thermischen Chaos aus die Temperatur, so beginnen die Spins in der Nähe des kritischen Punktes, sich innerhalb der Weißschen Bezirke in eine Richtung auszurichten. Da hierbei keine der beiden Richtungen einen Vorzug erhält, wechselt der Mittelwert der Magnetisierung beliebig das Vorzeichen.
+
+Hier zeigt sich die Simulation mit dem Metropolis Algorithmus (Gl. \ref{eq:KanonischerMetropolis}) fehlerbehaftet, da sich die positiven und negativen Beiträge dieser Bezirke aus Symetriegründen insgesamt aufheben müssten. Die Cluster kann der {\bfseries Algorithmus} jedoch nur von den Rändern her umdrehen, denn das Flippen eine Spins in der Mitte eines solchen Clusters ist sehr unwahrscheinlich. Die Cluster bleiben also für längere Zeit bestehen und brechen die Symetrie der Verteilung -- es entsteht eine {\bfseries vermeintliche Magnetisierung}, die letztlich dem Verlust von Ergodizität (siehe Abschnitt \ref{sec:Ergodizitaet}) der Markov-Kette geschuldet ist. Für kleine Temperaturen sieht man sogar, dass sich das Vorzeichen garnicht mehr verändert und mit der Zeit alle Spins ebenfalls passend geflippt werden.
+
+Ein Beispiel für eine Modifikation des Algorithmus', welcher diesem Sachverhalt Sorge trägt, ist der Cluster-Algorithmus, der von Swendson/Wang (1987) und Wolff (1989)  erstmals vorgestell wurde. Die Cluster werden analysiert, im Ganzen gewichtet und eventuell geflippt. Für kleine Temperaturen werden die Cluster also korrekterweise ebenfalls bei fast jedem MC-Schritt geflippt und die Mittelung ergibt wie erwartet eine verschwindende Magnetisierung (vgl. \cite{Diplom}).
+
+Die mittlere magnetische Suszeptibilität (Gl. \ref{eq:Suszeptibilitaet}) in Abb. \ref{fig:KMCSSuszeptibilitaet} zeigt ein ähnliches Verhalten, wie die Wärmekapazität. Auch sie formt zum Phasenübergang hin einen einen Peak aus. In der Realität ist allerdings auch sie immer 0, falls es kein äußeres Magnetfeld gibt.
+
+\subsection{Mittelwert der abs. Magnetisierung und mag. Suszeptibilität}
+
+Nachdem die Magnetisierung zufällig das Vorzeichen wechselt und sich für Systeme ohne externes Magnetfeld wegmittelt, betrachtet man häufig nur die {\bfseries absolute Magnetisierung} (Gl. \ref{eq:AbsoluteMagnetisierung}) in Abb. \ref{fig:KMCSAbsoluteMagnetisierung} und deren Varianz (Gl. \ref{eq:AbsoluteSuszeptibilitaet}) in Abb. \ref{fig:KMCSAbsoluteSuszeptibilitaet}. Beide Größen stellen sogenannte {\bfseries Ordnungsparameter} dar; sie verdeutlichen gut das Ausbilden von Clustern. Insbesondere zeigen sie für {\bfseries verschiedene Systemgrößen} $N$, dass der Prozess vom thermischen Chaos zur Ordnung hin im größeren System deutlich schneller vonstatten geht. Da sie Spin-Inversions-invariant sind, stellen sie trotz Clusterbildung Größen dar, welche der Metropolis Algorithmus zuverlässig berechnet.
+
+Die mittlere absolute magnetische Suszeptibilität bietet sich neben der Wärmekapazität weiterhin an, $T_c$ und kritische Exponenten zu finden \ref{sec:IsingEnergie}.
+
+\begin{figure}[bh]
+  \centering
+  \subfloat[{\bfseries Mittelwerte der abs. Magnetisierung}]{
+    \label{fig:KMCSAbsoluteMagnetisierung}
+    \includegraphics[width=0.48\textwidth]{Diagrams/KMCS/AbsoluteMagnetization-Temperature} 
+  }
+  \subfloat[{\bfseries Mittelwerte der abs. mag. Suszeptibilität}]{
+    \label{fig:KMCSAbsoluteSuszeptibilitaet}
+    \includegraphics[width=0.48\textwidth]{Diagrams/KMCS/AbsoluteMagneticSusceptibility-Temperature} 
+  }
+  \caption[Mittlere abs. Magnetisierung und mag. Suszeptibilität; {\itshape Quelle:} Eigenwerk]{Mittelwerte der absoluten Magnetisierung und magnetischen Suszeptibilität für verschieden große Gitter mit periodischen Randbedingungen bei 10000 Messpunkten pro Temperaturpunkt; {\itshape Quelle:} Eigenwerk}
+  \label{fig:KMCSAbsoluteMagnetisierungUndSuszeptibilitaet}
+\end{figure}
